@@ -35,8 +35,9 @@ const MOON_DISTANCE = 384400000; // meters (384,400 km)
 const LOW_ORBIT_ALTITUDE = 200000; // meters (200 km)
 const LUNAR_ORBIT_ALTITUDE = 100000; // meters (100 km above moon)
 
-// Rocket parts data (copied from RocketBuilder)
+// Rocket parts data - Enhanced for moon missions
 const availableParts: RocketPart[] = [
+  // Bodies - Lightweight options for better performance
   {
     id: "aluminum-body",
     name: "Aluminum Fuselage",
@@ -53,6 +54,16 @@ const availableParts: RocketPart[] = [
     unlocked: true,
     icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
   },
+  {
+    id: "titanium-body",
+    name: "Titanium Body",
+    type: "body",
+    weight: 60,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=200&h=200&fit=crop&crop=center",
+  },
+
+  // Engines - Multiple power levels for different mission profiles
   {
     id: "liquid-fuel-engine",
     name: "Liquid Fuel Engine",
@@ -72,9 +83,76 @@ const availableParts: RocketPart[] = [
     icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
   },
   {
+    id: "super-heavy-engine",
+    name: "Super Heavy Engine",
+    type: "engine",
+    weight: 200,
+    thrust: 5000,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+  },
+  {
+    id: "lunar-engine",
+    name: "Lunar Landing Engine",
+    type: "engine",
+    weight: 120,
+    thrust: 3000,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+  },
+  {
+    id: "moon-rocket-engine",
+    name: "Moon Rocket Engine",
+    type: "engine",
+    weight: 300,
+    thrust: 8000,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+  },
+
+  // Fuel Tanks - Multiple sizes for different mission requirements
+  {
+    id: "fuel-tank",
+    name: "Standard Fuel Tank",
+    type: "fuel",
+    weight: 30,
+    fuelCapacity: 1000,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+  },
+  {
+    id: "large-fuel-tank",
+    name: "Large Fuel Tank",
+    type: "fuel",
+    weight: 80,
+    fuelCapacity: 3000,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+  },
+  {
+    id: "mega-fuel-tank",
+    name: "Mega Fuel Tank",
+    type: "fuel",
+    weight: 150,
+    fuelCapacity: 10000,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+  },
+  {
+    id: "moon-fuel-tank",
+    name: "Moon Mission Fuel Tank",
+    type: "fuel",
+    weight: 200,
+    fuelCapacity: 15000,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+  },
+
+  // Additional Components
+  {
     id: "fins",
     name: "Stabilizing Fins",
-    type: "fins",
+    type: "wings",
     weight: 20,
     unlocked: true,
     icon: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=200&h=200&fit=crop&crop=center",
@@ -82,24 +160,15 @@ const availableParts: RocketPart[] = [
   {
     id: "nose-cone",
     name: "Aerodynamic Nose Cone",
-    type: "nose",
+    type: "extras",
     weight: 15,
     unlocked: true,
     icon: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=200&h=200&fit=crop&crop=center",
   },
   {
-    id: "fuel-tank",
-    name: "Fuel Tank",
-    type: "fuel",
-    weight: 30,
-    fuel: 1000,
-    unlocked: true,
-    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
-  },
-  {
     id: "guidance-system",
     name: "Guidance System",
-    type: "guidance",
+    type: "extras",
     weight: 25,
     unlocked: true,
     icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
@@ -107,7 +176,7 @@ const availableParts: RocketPart[] = [
   {
     id: "parachute",
     name: "Recovery Parachute",
-    type: "recovery",
+    type: "extras",
     weight: 10,
     unlocked: true,
     icon: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=200&h=200&fit=crop&crop=center",
@@ -115,7 +184,7 @@ const availableParts: RocketPart[] = [
   {
     id: "payload",
     name: "Payload Bay",
-    type: "payload",
+    type: "extras",
     weight: 40,
     unlocked: true,
     icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
@@ -123,8 +192,11 @@ const availableParts: RocketPart[] = [
 ];
 
 export default function CombinedBuilder() {
-  const { state, updateRocket } = useGame();
-  const [selectedPart, setSelectedPart] = useState<string | null>(null);
+  const { state, dispatch } = useGame();
+
+  const updateRocket = (rocketUpdate: Partial<typeof state.currentRocket>) => {
+    dispatch({ type: "UPDATE_ROCKET", payload: rocketUpdate });
+  };
   const [simState, setSimState] = useState<SimulationState>({
     altitude: 0,
     velocity: 0,
@@ -144,25 +216,50 @@ export default function CombinedBuilder() {
     rocketY: 80,
   });
 
-  // Calculate rocket specs
-  const rocketMass = state.currentRocket.parts.reduce(
-    (sum, part) => sum + part.weight,
-    0
-  );
-  const totalThrust = state.currentRocket.parts
-    .filter((part) => part.type === "engine")
-    .reduce((sum, part) => sum + (part.thrust || 0), 0);
-  const fuelCapacity = state.currentRocket.parts
-    .filter((part) => part.type === "fuel")
-    .reduce((sum, part) => sum + (part.fuel || 0), 0);
+  // Calculate rocket specs (matching LaunchSimulation approach)
+  const rocketMass =
+    state.currentRocket.mass ||
+    state.currentRocket.parts.reduce((sum, part) => sum + part.weight, 0);
+  const totalThrust =
+    state.currentRocket.thrust ||
+    state.currentRocket.parts
+      .filter((part) => part.type === "engine")
+      .reduce((sum, part) => sum + (part.thrust || 0), 0);
+  const fuelCapacity =
+    state.currentRocket.fuel ||
+    state.currentRocket.parts
+      .filter((part) => part.type === "fuel")
+      .reduce((sum, part) => sum + (part.fuelCapacity || 0), 0);
   const drag =
-    state.currentRocket.parts.filter((part) => part.type === "fins").length *
-    0.1;
+    state.currentRocket.drag ||
+    state.currentRocket.parts.filter((part) => part.type === "wings").length *
+      0.1;
+  // Calculate realistic physics parameters (matching LaunchSimulation.tsx)
   const thrustToWeight = totalThrust / (rocketMass * 9.81);
+
+  // Calculate specific impulse (simplified)
+  const specificImpulse = 300; // seconds (typical for liquid fuel)
+  const fuelFlowRate =
+    totalThrust > 0
+      ? (totalThrust / (specificImpulse * 9.81)) * 2 // kg/s - 2x faster for quick simulation
+      : 0.1; // Fallback fuel flow rate when no engines
+
+  // Calculate delta-v capability (proper Tsiolkovsky rocket equation)
+  // Convert fuel from liters to kg (assuming 1L = 1kg for rocket fuel)
+  const fuelMass = fuelCapacity; // 1L ≈ 1kg for rocket fuel
   const deltaV =
-    (totalThrust / rocketMass) *
-    Math.log(fuelCapacity / (fuelCapacity - fuelCapacity * 0.8));
-  const fuelFlowRate = totalThrust / 300; // Simplified fuel flow
+    specificImpulse * 9.81 * Math.log((rocketMass + fuelMass) / rocketMass);
+
+  // Mission feasibility analysis (adjusted for simplified physics)
+  const moonMissionDeltaV = 8000; // m/s required for Earth to Moon (simplified)
+  const canReachMoon = deltaV >= moonMissionDeltaV && thrustToWeight >= 1.0;
+  const missionStatus = canReachMoon
+    ? "success"
+    : thrustToWeight < 1.0
+    ? "insufficient-thrust"
+    : deltaV < moonMissionDeltaV
+    ? "insufficient-delta-v"
+    : "unknown";
 
   // Simulation logic (simplified from LaunchSimulation)
   useEffect(() => {
@@ -337,8 +434,24 @@ export default function CombinedBuilder() {
       newParts.push(part);
     }
 
-    updateRocket({ ...state.currentRocket, parts: newParts });
-    setSelectedPart(part.id);
+    // Calculate new rocket properties
+    const newMass = newParts.reduce((sum, p) => sum + p.weight, 0);
+    const newThrust = newParts
+      .filter((p) => p.type === "engine")
+      .reduce((sum, p) => sum + (p.thrust || 0), 0);
+    const newFuel = newParts
+      .filter((p) => p.type === "fuel")
+      .reduce((sum, p) => sum + (p.fuelCapacity || 0), 0);
+    const newDrag = newParts.filter((p) => p.type === "wings").length * 0.1;
+
+    updateRocket({
+      ...state.currentRocket,
+      parts: newParts,
+      mass: newMass,
+      thrust: newThrust,
+      fuel: newFuel,
+      drag: newDrag,
+    });
   };
 
   const handleLaunch = () => {
@@ -412,6 +525,42 @@ export default function CombinedBuilder() {
           {/* Rocket Stats */}
           <div className="bg-black/40 backdrop-blur-sm rounded-xl p-6 border border-white/10">
             <h2 className="text-xl font-bold mb-4">📊 Rocket Specifications</h2>
+
+            {/* Mission Feasibility Indicator */}
+            <div
+              className={`mb-4 p-3 rounded-lg border-2 ${
+                missionStatus === "success"
+                  ? "bg-green-500/20 border-green-400 text-green-300"
+                  : "bg-red-500/20 border-red-400 text-red-300"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-lg">
+                  {missionStatus === "success" ? "🌙" : "⚠️"}
+                </span>
+                <div>
+                  <div className="font-bold">
+                    {missionStatus === "success"
+                      ? "Moon Mission: READY!"
+                      : missionStatus === "insufficient-thrust"
+                      ? "Insufficient Thrust"
+                      : missionStatus === "insufficient-delta-v"
+                      ? "Insufficient Delta-V"
+                      : "Mission Analysis"}
+                  </div>
+                  <div className="text-xs">
+                    {missionStatus === "success"
+                      ? "Your rocket can reach the moon!"
+                      : missionStatus === "insufficient-thrust"
+                      ? "Need T/W ratio ≥ 1.0 to lift off"
+                      : missionStatus === "insufficient-delta-v"
+                      ? `Need ${moonMissionDeltaV.toLocaleString()} m/s ΔV for moon mission`
+                      : "Check your rocket configuration"}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-gray-400">Mass:</span>
@@ -427,13 +576,25 @@ export default function CombinedBuilder() {
               </div>
               <div>
                 <span className="text-gray-400">T/W Ratio:</span>
-                <span className="ml-2 font-mono">
+                <span
+                  className={`ml-2 font-mono ${
+                    thrustToWeight >= 1.0 ? "text-green-400" : "text-red-400"
+                  }`}
+                >
                   {thrustToWeight.toFixed(2)}
                 </span>
               </div>
               <div>
                 <span className="text-gray-400">ΔV:</span>
-                <span className="ml-2 font-mono">{deltaV.toFixed(0)} m/s</span>
+                <span
+                  className={`ml-2 font-mono ${
+                    deltaV >= moonMissionDeltaV
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }`}
+                >
+                  {deltaV.toFixed(0)} m/s
+                </span>
               </div>
               <div>
                 <span className="text-gray-400">Fuel:</span>
@@ -446,12 +607,22 @@ export default function CombinedBuilder() {
                 <span className="ml-2 font-mono">{drag.toFixed(2)}</span>
               </div>
             </div>
+
+            {/* Mission Requirements */}
+            <div className="mt-4 pt-4 border-t border-white/10">
+              <div className="text-xs text-gray-400">
+                <div className="mb-1">🌙 Moon Mission Requirements:</div>
+                <div>• Thrust-to-Weight Ratio: ≥ 1.0</div>
+                <div>• Delta-V: ≥ {moonMissionDeltaV.toLocaleString()} m/s</div>
+                <div>• Orbital Velocity: ≥ 8,000 m/s</div>
+              </div>
+            </div>
           </div>
 
           {/* Parts Selection */}
           <div className="bg-black/40 backdrop-blur-sm rounded-xl p-6 border border-white/10">
             <h2 className="text-xl font-bold mb-4">🔧 Select Parts</h2>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               {availableParts.map((part) => (
                 <button
                   key={part.id}
@@ -493,7 +664,7 @@ export default function CombinedBuilder() {
                     <div className="text-xs text-gray-400">
                       {part.weight}kg
                       {part.thrust && ` • ${part.thrust}N`}
-                      {part.fuel && ` • ${part.fuel}L`}
+                      {part.fuelCapacity && ` • ${part.fuelCapacity}L`}
                     </div>
                   </div>
                 </button>
@@ -517,15 +688,17 @@ export default function CombinedBuilder() {
               {!simState.isLaunched ? (
                 <button
                   onClick={handleLaunch}
-                  disabled={fuelCapacity <= 0}
+                  disabled={fuelCapacity <= 0 || !canReachMoon}
                   className={`w-full py-3 rounded-lg font-bold text-lg transition-colors ${
-                    fuelCapacity <= 0
+                    fuelCapacity <= 0 || !canReachMoon
                       ? "bg-gray-600 text-gray-400 cursor-not-allowed"
                       : "bg-green-600 hover:bg-green-500"
                   }`}
                 >
                   {fuelCapacity <= 0 ? (
                     "⛽ ADD FUEL TO LAUNCH"
+                  ) : !canReachMoon ? (
+                    "⚠️ IMPROVE ROCKET DESIGN"
                   ) : (
                     <>
                       <Image
@@ -535,7 +708,7 @@ export default function CombinedBuilder() {
                         height={20}
                         className="w-5 h-5 mr-2"
                       />
-                      LAUNCH ROCKET
+                      🚀 LAUNCH TO MOON
                     </>
                   )}
                 </button>

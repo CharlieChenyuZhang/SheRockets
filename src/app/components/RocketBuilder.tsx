@@ -28,6 +28,14 @@ const availableParts: RocketPart[] = [
     icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
   },
   {
+    id: "titanium-body",
+    name: "Titanium Body",
+    type: "body",
+    weight: 60,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=200&h=200&fit=crop&crop=center",
+  },
+  {
     id: "liquid-fuel-engine",
     name: "Liquid Fuel Engine",
     type: "engine",
@@ -42,6 +50,33 @@ const availableParts: RocketPart[] = [
     type: "engine",
     weight: 70,
     thrust: 150,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+  },
+  {
+    id: "super-heavy-engine",
+    name: "Super Heavy Engine",
+    type: "engine",
+    weight: 200,
+    thrust: 5000,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+  },
+  {
+    id: "lunar-engine",
+    name: "Lunar Landing Engine",
+    type: "engine",
+    weight: 120,
+    thrust: 3000,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+  },
+  {
+    id: "moon-rocket-engine",
+    name: "Moon Rocket Engine",
+    type: "engine",
+    weight: 300,
+    thrust: 8000,
     unlocked: true,
     icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
   },
@@ -68,7 +103,7 @@ const availableParts: RocketPart[] = [
     name: "Liquid Fuel Tank",
     type: "fuel",
     weight: 30,
-    fuelCapacity: 100,
+    fuelCapacity: 1000,
     unlocked: true,
     icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
   },
@@ -79,6 +114,33 @@ const availableParts: RocketPart[] = [
     weight: 40,
     fuelCapacity: 150,
     unlocked: false,
+    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+  },
+  {
+    id: "large-fuel-tank",
+    name: "Large Fuel Tank",
+    type: "fuel",
+    weight: 80,
+    fuelCapacity: 3000,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+  },
+  {
+    id: "mega-fuel-tank",
+    name: "Mega Fuel Tank",
+    type: "fuel",
+    weight: 150,
+    fuelCapacity: 10000,
+    unlocked: true,
+    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+  },
+  {
+    id: "moon-fuel-tank",
+    name: "Moon Mission Fuel Tank",
+    type: "fuel",
+    weight: 200,
+    fuelCapacity: 15000,
+    unlocked: true,
     icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
   },
   {
@@ -787,6 +849,83 @@ export default function RocketBuilder() {
                   ).toFixed(2)}
                 </span>
               </div>
+            </div>
+
+            {/* Mission Feasibility Analysis */}
+            <div className="p-4 bg-gray-800/50 rounded-lg border border-pink-500/30">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-white font-bold text-lg">
+                  🌙 Moon Mission Analysis
+                </h3>
+                <span className="text-2xl">🚀</span>
+              </div>
+
+              {(() => {
+                const thrustToWeight =
+                  state.currentRocket.thrust /
+                  (state.currentRocket.mass * 9.81);
+                const fuelMass = state.currentRocket.fuel; // Assuming 1L = 1kg
+                const specificImpulse = 300;
+                const deltaV =
+                  specificImpulse *
+                  9.81 *
+                  Math.log(
+                    (state.currentRocket.mass + fuelMass) /
+                      state.currentRocket.mass
+                  );
+                const moonMissionDeltaV = 8000;
+                const canReachMoon =
+                  deltaV >= moonMissionDeltaV && thrustToWeight >= 1.0;
+
+                return (
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/80">T/W Ratio:</span>
+                      <span
+                        className={`font-mono ${
+                          thrustToWeight >= 1.0
+                            ? "text-green-400"
+                            : "text-red-400"
+                        }`}
+                      >
+                        {thrustToWeight.toFixed(2)}{" "}
+                        {thrustToWeight >= 1.0 ? "✅" : "❌"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/80">Delta-V:</span>
+                      <span
+                        className={`font-mono ${
+                          deltaV >= moonMissionDeltaV
+                            ? "text-green-400"
+                            : "text-red-400"
+                        }`}
+                      >
+                        {deltaV.toFixed(0)} m/s{" "}
+                        {deltaV >= moonMissionDeltaV ? "✅" : "❌"}
+                      </span>
+                    </div>
+                    <div className="mt-3 p-2 rounded-lg border-2">
+                      <div
+                        className={`text-center font-bold ${
+                          canReachMoon
+                            ? "text-green-400 bg-green-500/20 border-green-400"
+                            : "text-red-400 bg-red-500/20 border-red-400"
+                        }`}
+                      >
+                        {canReachMoon
+                          ? "🌙 MOON MISSION: READY!"
+                          : "⚠️ NEEDS IMPROVEMENT"}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-1 text-center">
+                        {canReachMoon
+                          ? "Your rocket can reach the moon!"
+                          : "Need T/W ≥ 1.0 and ΔV ≥ 8,000 m/s"}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

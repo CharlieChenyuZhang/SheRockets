@@ -152,7 +152,27 @@ export default function LaunchSimulation() {
 
   // Calculate specific impulse (simplified)
   const specificImpulse = 300; // seconds (typical for liquid fuel)
-  const fuelFlowRate = thrust / (specificImpulse * 9.81); // kg/s
+  const fuelFlowRate =
+    thrust > 0
+      ? (thrust / (specificImpulse * 9.81)) * 2 // kg/s - 2x faster for quick simulation
+      : 0.1; // Fallback fuel flow rate when no engines (for testing)
+
+  // Debug initial values
+  console.log(
+    `🚀 LaunchSimulation - Thrust: ${thrust}N, FuelCapacity: ${fuelCapacity}L, FuelFlowRate: ${fuelFlowRate.toFixed(
+      2
+    )} kg/s`
+  );
+  console.log(
+    `🔧 Rocket Parts:`,
+    state.currentRocket.parts.map((p) => `${p.name} (${p.type})`)
+  );
+  console.log(`📊 Rocket Stats:`, {
+    mass: rocketMass,
+    thrust,
+    fuel: fuelCapacity,
+    drag,
+  });
 
   // Calculate delta-v capability
   const deltaV =
@@ -171,6 +191,16 @@ export default function LaunchSimulation() {
             0,
             prev.fuel - fuelFlowRate * dt * 1000
           ); // convert back to L
+
+          // Debug fuel consumption
+          if (prev.time % 1 < 0.1) {
+            // Log every second
+            console.log(
+              `⛽ Fuel: ${prev.fuel.toFixed(1)}L → ${fuelRemaining.toFixed(
+                1
+              )}L (flow: ${fuelFlowRate.toFixed(2)} kg/s)`
+            );
+          }
           const hasFuel = fuelRemaining > 0;
 
           let newAltitude = prev.altitude;
@@ -1213,23 +1243,27 @@ export default function LaunchSimulation() {
               <div
                 className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-500 ease-out"
                 style={{
-                  width: `${(simState.fuel / state.currentRocket.fuel) * 100}%`,
+                  width: `${
+                    state.currentRocket.fuel > 0
+                      ? (simState.fuel / state.currentRocket.fuel) * 100
+                      : 0
+                  }%`,
                 }}
               />
             </div>
           </div>
         </div>
 
-        {/* Unified Controls Below Earth */}
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
+        {/* Side Controls Panel */}
+        <div className="absolute right-6 top-1/2 transform -translate-y-1/2">
           <div className="bg-black/30 backdrop-blur-xl rounded-xl p-4 border border-white/20 shadow-xl">
-            <div className="flex items-center justify-center space-x-4">
+            <div className="flex flex-col space-y-3">
               {/* Launch Mission Button */}
               {!simState.isLaunched && (
                 <button
                   onClick={handleLaunch}
                   disabled={fuelCapacity <= 0}
-                  className={`backdrop-blur-xl px-8 py-3 rounded-xl text-lg font-medium transition-all duration-200 shadow-xl border ${
+                  className={`backdrop-blur-xl px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-xl border w-full ${
                     fuelCapacity <= 0
                       ? "bg-gray-600/30 text-gray-400 border-gray-500/30 cursor-not-allowed"
                       : "bg-white/20 hover:bg-white/30 text-white border-white/30 hover:scale-105 active:scale-95"
@@ -1237,14 +1271,14 @@ export default function LaunchSimulation() {
                 >
                   <span className="flex items-center justify-center space-x-3">
                     {fuelCapacity <= 0 ? (
-                      <span className="text-xl">⛽</span>
+                      <span className="text-lg">⛽</span>
                     ) : (
                       <Image
                         src="/rocket.png"
                         alt="Rocket"
-                        width={24}
-                        height={24}
-                        className="w-6 h-6"
+                        width={20}
+                        height={20}
+                        className="w-5 h-5"
                       />
                     )}
                     <span>
@@ -1260,10 +1294,10 @@ export default function LaunchSimulation() {
               {!simState.isLaunched && (
                 <button
                   onClick={handleDemoMode}
-                  className="bg-purple-500/80 hover:bg-purple-500 backdrop-blur-xl text-white px-6 py-3 rounded-xl text-lg font-medium transition-all duration-200 hover:scale-105 active:scale-95 shadow-xl border border-purple-400/30"
+                  className="bg-purple-500/80 hover:bg-purple-500 backdrop-blur-xl text-white px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 shadow-xl border border-purple-400/30 w-full"
                 >
-                  <span className="flex items-center justify-center space-x-3">
-                    <span className="text-xl">🎬</span>
+                  <span className="flex items-center justify-center space-x-2">
+                    <span className="text-lg">🎬</span>
                     <span>Demo Mode</span>
                   </span>
                 </button>
@@ -1273,7 +1307,7 @@ export default function LaunchSimulation() {
               <button
                 data-testid="retry-button"
                 onClick={handleRetry}
-                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 w-full"
               >
                 <span className="flex items-center space-x-2">
                   <span>🔄</span>
@@ -1285,7 +1319,7 @@ export default function LaunchSimulation() {
               <button
                 data-testid="back-to-builder-button"
                 onClick={handleBackToBuilder}
-                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
+                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 w-full"
               >
                 <span className="flex items-center space-x-2">
                   <span>🔧</span>
