@@ -4,6 +4,39 @@ import { useGame } from "./GameProvider";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
+// Custom CSS for thrust fire animations
+const thrustFireStyles = `
+  @keyframes thrustFlicker {
+    0%, 100% { opacity: 0.9; transform: scaleY(1); }
+    25% { opacity: 0.7; transform: scaleY(1.1); }
+    50% { opacity: 0.8; transform: scaleY(0.9); }
+    75% { opacity: 0.6; transform: scaleY(1.05); }
+  }
+  
+  @keyframes thrustPulse {
+    0%, 100% { opacity: 0.85; transform: scaleY(1) scaleX(1); }
+    50% { opacity: 0.95; transform: scaleY(1.2) scaleX(0.8); }
+  }
+  
+  @keyframes particleFloat {
+    0% { opacity: 0.8; transform: translateY(0) scale(1); }
+    50% { opacity: 0.4; transform: translateY(-10px) scale(0.8); }
+    100% { opacity: 0; transform: translateY(-20px) scale(0.5); }
+  }
+  
+  .thrust-main {
+    animation: thrustFlicker 0.1s ease-in-out infinite;
+  }
+  
+  .thrust-side {
+    animation: thrustPulse 0.15s ease-in-out infinite;
+  }
+  
+  .thrust-particle {
+    animation: particleFloat 0.8s ease-out infinite;
+  }
+`;
+
 interface SimulationState {
   altitude: number;
   velocity: number;
@@ -66,6 +99,17 @@ const twinkleData = generateStarData(20, 54321);
 export default function LaunchSimulation() {
   const { state, navigateTo } = useGame();
   const [isAITutorOpen, setIsAITutorOpen] = useState(false);
+
+  // Inject custom CSS for thrust fire animations
+  useEffect(() => {
+    const styleElement = document.createElement("style");
+    styleElement.textContent = thrustFireStyles;
+    document.head.appendChild(styleElement);
+
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
   const [chatMessages, setChatMessages] = useState([
     {
       id: "1",
@@ -92,8 +136,8 @@ export default function LaunchSimulation() {
     orbitalVelocity: 0,
     escapeVelocity: 0,
     positionHistory: [],
-    rocketX: 25,
-    rocketY: 92,
+    rocketX: 50,
+    rocketY: 85,
     failureReason: undefined,
   });
 
@@ -316,10 +360,10 @@ export default function LaunchSimulation() {
           }
 
           // Use the initial rocket position as the starting point
-          // Earth center is at bottom-8 left-1/4 = (25%, 92%)
-          // Use Earth center for perfect alignment
-          const initialRocketPos = { x: 25, y: 92 }; // Earth center position
-          const moonPos = { x: 75, y: 25 };
+          // Earth center is at bottom-8 left-1/2 = (50%, 92%)
+          // Rocket starts centered on top of Earth for realistic launch
+          const initialRocketPos = { x: 50, y: 85 }; // Centered on top of Earth
+          const moonPos = { x: 67, y: 25 };
 
           let newRocketX, newRocketY;
 
@@ -494,10 +538,10 @@ export default function LaunchSimulation() {
       x: simState.rocketX,
       y: simState.rocketY,
     });
-    console.log("🌍 Earth position:", { x: 25, y: 92 });
-    console.log("🌙 Moon position:", { x: 75, y: 25 });
+    console.log("🌍 Earth position:", { x: 50, y: 92 });
+    console.log("🌙 Moon position:", { x: 67, y: 25 });
     console.log("⏱️ Starting simulation...");
-    console.log("🎯 Rocket should start at Earth center (25%, 92%)");
+    console.log("🎯 Rocket starts on top of Earth (50%, 85%)");
     setSimState((prev) => ({ ...prev, isLaunched: true }));
   };
 
@@ -508,15 +552,15 @@ export default function LaunchSimulation() {
     setSimState((prev) => ({
       ...prev,
       isLaunched: true,
-      rocketX: 25, // Ensure rocket starts at exact Earth position
-      rocketY: 92, // Ensure rocket starts at exact Earth position
+      rocketX: 50, // Ensure rocket starts on top of Earth
+      rocketY: 88, // Ensure rocket starts on top of Earth
       time: 0, // Reset time to start fresh
     }));
   };
 
   const handleRetry = () => {
     console.log("🔄 RETRY BUTTON CLICKED!");
-    console.log("📍 Resetting rocket to Earth position:", { x: 25, y: 92 });
+    console.log("📍 Resetting rocket to Earth position:", { x: 50, y: 85 });
     // Add visual feedback
     const button = document.querySelector(
       '[data-testid="retry-button"]'
@@ -543,8 +587,8 @@ export default function LaunchSimulation() {
       orbitalVelocity: 0,
       escapeVelocity: 0,
       positionHistory: [],
-      rocketX: 25,
-      rocketY: 92,
+      rocketX: 50,
+      rocketY: 85,
     });
   };
 
@@ -672,13 +716,14 @@ export default function LaunchSimulation() {
           {starData.map((star, i) => (
             <div
               key={i}
-              className="absolute w-px h-px bg-white rounded-full animate-pulse"
+              className="absolute w-px h-px bg-white rounded-full animate-pulse shadow-lg"
               style={{
                 left: `${star.left}%`,
                 top: `${star.top}%`,
                 opacity: star.opacity,
                 animationDelay: `${star.animationDelay}s`,
                 animationDuration: `${star.animationDuration}s`,
+                boxShadow: `0 0 4px rgba(255, 255, 255, ${star.opacity})`,
               }}
             />
           ))}
@@ -840,34 +885,19 @@ export default function LaunchSimulation() {
         {/* Celestial Bodies */}
         <div className="absolute inset-0">
           {/* Earth */}
-          <div className="absolute bottom-8 left-1/4">
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
             <div className="relative">
-              <div className="w-28 h-28 bg-gradient-to-b from-blue-500 via-blue-600 to-green-700 rounded-full shadow-2xl border-2 border-blue-400/30 animate-pulse">
-                <div className="absolute inset-3 bg-gradient-to-b from-green-500 to-blue-600 rounded-full opacity-70"></div>
-                <div className="absolute top-3 left-4 w-2 h-2 bg-white/90 rounded-full animate-ping"></div>
-                <div className="absolute top-5 right-3 w-1 h-1 bg-white/70 rounded-full"></div>
-                <div className="absolute bottom-4 left-5 w-1.5 h-1.5 bg-white/80 rounded-full"></div>
-                {/* Atmospheric glow */}
-                <div className="absolute -inset-2 bg-blue-400/20 rounded-full blur-sm"></div>
+              <div className="w-32 h-32 bg-gradient-to-b from-blue-400 via-blue-600 to-green-600 rounded-full shadow-2xl border-2 border-blue-300/40 animate-pulse">
+                <div className="absolute inset-4 bg-gradient-to-b from-green-400 to-blue-500 rounded-full opacity-80"></div>
+                <div className="absolute top-4 left-5 w-2.5 h-2.5 bg-white/95 rounded-full animate-ping shadow-lg"></div>
+                <div className="absolute top-6 right-4 w-1.5 h-1.5 bg-white/80 rounded-full"></div>
+                <div className="absolute bottom-5 left-6 w-2 h-2 bg-white/90 rounded-full"></div>
+                <div className="absolute top-1/2 right-6 w-1 h-1 bg-white/70 rounded-full"></div>
+                <div className="absolute bottom-1/3 left-3 w-1 h-1 bg-white/60 rounded-full"></div>
+                {/* Enhanced atmospheric glow */}
+                <div className="absolute -inset-3 bg-blue-400/25 rounded-full blur-md"></div>
+                <div className="absolute -inset-1 bg-green-400/15 rounded-full blur-sm"></div>
               </div>
-
-              {/* Rocket on Earth (when not launched) */}
-              {!simState.isLaunched && (
-                <div className="absolute -top-10 left-1/2 transform -translate-x-1/2">
-                  <div className="text-6xl">
-                    <Image
-                      src="/rocket.png"
-                      alt="Rocket"
-                      width={96}
-                      height={96}
-                      className="w-24 h-24 drop-shadow-lg"
-                      style={{
-                        filter: "drop-shadow(0 0 4px rgba(255, 255, 255, 0.3))",
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
 
               <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
                 <div className="bg-black/80 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20">
@@ -878,25 +908,30 @@ export default function LaunchSimulation() {
           </div>
 
           {/* Moon */}
-          <div className="absolute top-1/4 right-1/4">
-            <div className="relative">
-              <div className="w-24 h-24 bg-gradient-to-b from-gray-300 via-gray-400 to-gray-500 rounded-full shadow-xl border-2 border-gray-300/50">
-                <div className="absolute inset-2 bg-gradient-to-b from-gray-200 to-gray-400 rounded-full opacity-80"></div>
-                <div className="absolute top-3 left-3 w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
-                <div className="absolute bottom-4 right-3 w-1 h-1 bg-gray-500 rounded-full"></div>
-                <div className="absolute top-1/2 left-2 w-1 h-1 bg-gray-600 rounded-full"></div>
-                <div className="absolute top-4 right-4 w-1 h-1 bg-gray-500 rounded-full"></div>
-                <div className="absolute bottom-3 left-3 w-0.5 h-0.5 bg-gray-600 rounded-full"></div>
-                {/* Moon glow */}
-                <div className="absolute -inset-1 bg-gray-300/10 rounded-full blur-sm"></div>
-              </div>
-              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
-                <div className="bg-black/80 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20">
-                  <span className="text-white text-xs font-medium">MOON</span>
+          {!simState.success && (
+            <div className="absolute top-1/4 right-1/3">
+              <div className="relative">
+                <div className="w-28 h-28 bg-gradient-to-b from-gray-200 via-gray-400 to-gray-600 rounded-full shadow-2xl border-2 border-gray-200/60">
+                  <div className="absolute inset-3 bg-gradient-to-b from-gray-100 to-gray-500 rounded-full opacity-90"></div>
+                  <div className="absolute top-4 left-4 w-2 h-2 bg-gray-700 rounded-full shadow-sm"></div>
+                  <div className="absolute bottom-5 right-4 w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
+                  <div className="absolute top-1/2 left-3 w-1.5 h-1.5 bg-gray-700 rounded-full"></div>
+                  <div className="absolute top-5 right-5 w-1 h-1 bg-gray-600 rounded-full"></div>
+                  <div className="absolute bottom-4 left-4 w-1 h-1 bg-gray-700 rounded-full"></div>
+                  <div className="absolute top-1/3 right-2 w-0.5 h-0.5 bg-gray-600 rounded-full"></div>
+                  <div className="absolute bottom-1/3 left-2 w-0.5 h-0.5 bg-gray-700 rounded-full"></div>
+                  {/* Enhanced Moon glow */}
+                  <div className="absolute -inset-2 bg-gray-200/20 rounded-full blur-md"></div>
+                  <div className="absolute -inset-1 bg-white/10 rounded-full blur-sm"></div>
+                </div>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
+                  <div className="bg-black/80 backdrop-blur-sm px-3 py-1 rounded-full border border-white/20">
+                    <span className="text-white text-xs font-medium">MOON</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Trajectory Visualization */}
@@ -926,12 +961,13 @@ export default function LaunchSimulation() {
           </defs>
           {/* Earth to Moon trajectory */}
           <path
-            d="M 25 70 Q 50 40 75 25"
-            stroke="rgba(59, 130, 246, 0.3)"
-            strokeWidth="2"
+            d="M 50 70 Q 58 40 67 25"
+            stroke="url(#trajectoryGradient)"
+            strokeWidth="3"
             fill="none"
-            strokeDasharray="8,8"
+            strokeDasharray="12,8"
             className="animate-pulse"
+            filter="drop-shadow(0 0 4px rgba(59, 130, 246, 0.5))"
           />
 
           {/* Dynamic trajectory path showing rocket's actual path */}
@@ -969,84 +1005,206 @@ export default function LaunchSimulation() {
           )}
         </svg>
 
-        {/* Rocket (only when launched) */}
-        {simState.isLaunched && (
-          <div
-            className="absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-500 ease-out"
-            style={{
-              left: `${rocketPos.x}%`,
-              top: `${rocketPos.y}%`,
-              transform: `translate(-50%, -50%) rotate(${simState.angle}deg)`,
-            }}
-          >
-            <div className="relative">
-              {/* Rocket icon */}
-              <div className="text-6xl transition-all duration-300">
-                {simState.missionPhase === "failed" ? (
-                  <Image
-                    src="/rocket.png"
-                    alt="Rocket"
-                    width={96}
-                    height={96}
-                    className="w-24 h-24 opacity-60 animate-pulse grayscale"
-                  />
-                ) : (
-                  <Image
-                    src="/rocket.png"
-                    alt="Rocket"
-                    width={96}
-                    height={96}
-                    className="w-24 h-24 drop-shadow-lg"
-                    style={{
-                      filter: "drop-shadow(0 0 12px rgba(59, 130, 246, 0.8))",
-                      animation: "rocketGlow 2s ease-in-out infinite alternate",
-                    }}
-                  />
-                )}
+        {/* Congratulations Message */}
+        {simState.success && (
+          <div className="absolute inset-0 flex items-center justify-center z-50">
+            <div className="bg-gradient-to-br from-pink-300/95 via-purple-400/95 to-blue-400/95 backdrop-blur-xl rounded-3xl p-10 border-2 border-white/30 shadow-2xl text-center relative">
+              {/* Close Button */}
+              <button
+                onClick={() =>
+                  setSimState((prev) => ({ ...prev, success: false }))
+                }
+                className="absolute top-4 right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors duration-200"
+                aria-label="Close congratulations"
+              >
+                <span className="text-white text-lg font-bold">×</span>
+              </button>
+              <div className="text-7xl mb-6 animate-bounce">🌟</div>
+              <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
+                Amazing Job!
+              </h1>
+              <p className="text-2xl text-white/95 mb-6 font-medium">
+                You&apos;re an amazing space explorer!
+              </p>
+              <div className="text-3xl mb-8 space-x-4">
+                <span
+                  className="animate-bounce"
+                  style={{ animationDelay: "0.1s" }}
+                >
+                  🚀
+                </span>
+                <span
+                  className="animate-bounce"
+                  style={{ animationDelay: "0.2s" }}
+                >
+                  🌙
+                </span>
+                <span
+                  className="animate-bounce"
+                  style={{ animationDelay: "0.3s" }}
+                >
+                  ✨
+                </span>
+                <span
+                  className="animate-bounce"
+                  style={{ animationDelay: "0.4s" }}
+                >
+                  💫
+                </span>
+                <span
+                  className="animate-bounce"
+                  style={{ animationDelay: "0.5s" }}
+                >
+                  🦄
+                </span>
               </div>
+              <p className="text-xl text-white/90 font-medium">
+                You&apos;ve conquered the stars! 🌟
+              </p>
+              <div className="mt-6 text-4xl">
+                <span className="animate-pulse">💖</span>
+                <span
+                  className="mx-4 animate-pulse"
+                  style={{ animationDelay: "0.5s" }}
+                >
+                  🌸
+                </span>
+                <span
+                  className="animate-pulse"
+                  style={{ animationDelay: "1s" }}
+                >
+                  💖
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
-              {/* Rocket thrust effect */}
-              {simState.isLaunched &&
-                simState.fuel > 0 &&
-                simState.missionPhase !== "failed" && (
-                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-                    {/* Main thrust flame */}
-                    <div className="w-4 h-10 bg-gradient-to-t from-orange-500 via-yellow-400 to-transparent rounded-b-full opacity-90 animate-pulse"></div>
-                    {/* Secondary flame */}
-                    <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-8 bg-gradient-to-t from-orange-600 via-yellow-500 to-transparent rounded-b-full opacity-70 animate-ping"></div>
-                    {/* Outer glow */}
-                    <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-8 h-12 bg-gradient-to-t from-red-500 via-orange-400 to-transparent rounded-b-full opacity-40 animate-pulse"></div>
+        {/* Rocket (both static and launched) */}
+        <div
+          className="absolute transition-all duration-500 ease-out"
+          style={{
+            left: `${rocketPos.x}%`,
+            top: `${rocketPos.y}%`,
+            transform: `translate(-50%, -50%) rotate(${simState.angle}deg)`,
+          }}
+        >
+          <div className="relative">
+            {/* Rocket icon */}
+            <div className="text-6xl transition-all duration-300 relative z-10">
+              {!simState.isLaunched ? (
+                // Static rocket on Earth
+                <Image
+                  src="/rocket.png"
+                  alt="Rocket"
+                  width={96}
+                  height={96}
+                  className="w-24 h-24 drop-shadow-lg"
+                  style={{
+                    filter:
+                      "drop-shadow(0 0 8px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 16px rgba(59, 130, 246, 0.3))",
+                  }}
+                />
+              ) : simState.missionPhase === "failed" ? (
+                // Failed rocket
+                <Image
+                  src="/rocket.png"
+                  alt="Rocket"
+                  width={96}
+                  height={96}
+                  className="w-24 h-24 opacity-60 animate-pulse grayscale"
+                />
+              ) : (
+                // Launched rocket
+                <Image
+                  src="/rocket.png"
+                  alt="Rocket"
+                  width={96}
+                  height={96}
+                  className="w-24 h-24 drop-shadow-lg"
+                  style={{
+                    filter:
+                      "drop-shadow(0 0 16px rgba(59, 130, 246, 0.9)) drop-shadow(0 0 24px rgba(139, 92, 246, 0.6))",
+                    animation: "rocketGlow 2s ease-in-out infinite alternate",
+                  }}
+                />
+              )}
+            </div>
+
+            {/* Rocket thrust effect */}
+            {simState.isLaunched &&
+              simState.fuel > 0 &&
+              simState.missionPhase !== "failed" &&
+              simState.missionPhase !== "landing" &&
+              !simState.success && (
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 z-0">
+                  {/* Main central flame */}
+                  <div className="w-3 h-16 bg-gradient-to-t from-red-600 via-orange-500 to-yellow-300 rounded-b-full opacity-90 shadow-lg thrust-main">
+                    <div className="absolute inset-0 bg-gradient-to-t from-red-700 to-transparent rounded-b-full opacity-70"></div>
+                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-1 h-2 bg-yellow-200 rounded-full opacity-80"></div>
                   </div>
-                )}
 
-              {/* Failure explosion effect */}
-              {simState.missionPhase === "failed" && (
-                <div className="absolute -top-4 -left-4 w-16 h-16">
-                  <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                  {/* Left side flame */}
+                  <div className="absolute -left-1 -bottom-2 w-2 h-12 bg-gradient-to-t from-red-500 via-orange-400 to-yellow-200 rounded-b-full opacity-85 shadow-md thrust-side">
+                    <div className="absolute inset-0 bg-gradient-to-t from-red-600 to-transparent rounded-b-full opacity-60"></div>
+                  </div>
+
+                  {/* Right side flame */}
+                  <div className="absolute -right-1 -bottom-2 w-2 h-12 bg-gradient-to-t from-red-500 via-orange-400 to-yellow-200 rounded-b-full opacity-85 shadow-md thrust-side">
+                    <div className="absolute inset-0 bg-gradient-to-t from-red-600 to-transparent rounded-b-full opacity-60"></div>
+                  </div>
+
+                  {/* Outer glow/halo */}
+                  <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-8 h-20 bg-gradient-to-t from-red-400 via-orange-300 to-transparent rounded-b-full opacity-30 animate-pulse blur-sm"></div>
+
+                  {/* Thrust particles - more realistic trail */}
+                  <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-yellow-300 rounded-full opacity-60 thrust-particle"></div>
                   <div
-                    className="absolute inset-1 bg-orange-400 rounded-full animate-ping opacity-50"
+                    className="absolute -bottom-18 left-1/2 transform -translate-x-1/2 w-0.5 h-0.5 bg-orange-400 rounded-full opacity-40 thrust-particle"
                     style={{ animationDelay: "0.2s" }}
                   ></div>
                   <div
-                    className="absolute inset-2 bg-yellow-300 rounded-full animate-ping opacity-25"
+                    className="absolute -bottom-14 left-1/4 transform -translate-x-1/2 w-0.5 h-0.5 bg-yellow-200 rounded-full opacity-50 thrust-particle"
+                    style={{ animationDelay: "0.1s" }}
+                  ></div>
+                  <div
+                    className="absolute -bottom-14 right-1/4 transform -translate-x-1/2 w-0.5 h-0.5 bg-orange-300 rounded-full opacity-50 thrust-particle"
+                    style={{ animationDelay: "0.3s" }}
+                  ></div>
+                  <div
+                    className="absolute -bottom-20 left-1/2 transform -translate-x-1/2 w-0.5 h-0.5 bg-red-300 rounded-full opacity-30 thrust-particle"
                     style={{ animationDelay: "0.4s" }}
                   ></div>
                 </div>
               )}
 
-              {/* Success glow effect */}
-              {simState.missionPhase === "landing" && simState.success && (
-                <div className="absolute -top-3 -left-3 w-14 h-14">
-                  <div className="absolute inset-0 bg-green-400 rounded-full animate-pulse opacity-50"></div>
-                  <div
-                    className="absolute inset-1 bg-green-300 rounded-full animate-pulse opacity-30"
-                    style={{ animationDelay: "0.3s" }}
-                  ></div>
-                </div>
-              )}
-            </div>
+            {/* Failure explosion effect */}
+            {simState.missionPhase === "failed" && (
+              <div className="absolute -top-4 -left-4 w-16 h-16 z-20">
+                <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                <div
+                  className="absolute inset-1 bg-orange-400 rounded-full animate-ping opacity-50"
+                  style={{ animationDelay: "0.2s" }}
+                ></div>
+                <div
+                  className="absolute inset-2 bg-yellow-300 rounded-full animate-ping opacity-25"
+                  style={{ animationDelay: "0.4s" }}
+                ></div>
+              </div>
+            )}
+
+            {/* Success glow effect */}
+            {simState.missionPhase === "landing" && simState.success && (
+              <div className="absolute -top-3 -left-3 w-14 h-14 z-20">
+                <div className="absolute inset-0 bg-green-400 rounded-full animate-pulse opacity-50"></div>
+                <div
+                  className="absolute inset-1 bg-green-300 rounded-full animate-pulse opacity-30"
+                  style={{ animationDelay: "0.3s" }}
+                ></div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Fuel Progress Bar */}
         <div className="absolute top-20 left-6 right-6">
