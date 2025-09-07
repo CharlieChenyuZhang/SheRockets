@@ -1,4 +1,6 @@
-# She Rocks! 🚀
+# SheRockets! 🚀
+
+`A Generative-AI Spacecraft Builder to Foster Girls’ STEM Identity and Early Physics`
 
 An educational physics game designed to inspire young girls to explore science, engineering, and space through magical rocket adventures!
 
