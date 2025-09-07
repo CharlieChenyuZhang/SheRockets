@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { GameProvider } from "./components/GameProvider";
-import AITutor from "./components/AITutor";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "She Rocks! - Physics Adventure Game",
+  title: "SheRockets!",
   description:
     "An educational physics game where kids build rockets and learn science through play!",
 };
@@ -30,10 +29,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black min-h-screen`}
       >
-        <GameProvider>
-          {children}
-          <AITutor />
-        </GameProvider>
+        <GameProvider>{children}</GameProvider>
       </body>
     </html>
   );

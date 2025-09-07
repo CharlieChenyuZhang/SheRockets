@@ -179,6 +179,13 @@ export default function RocketBuilder() {
   };
 
   const handleLaunch = () => {
+    // Check if rocket has fuel before launching
+    if (state.currentRocket.fuel <= 0) {
+      alert(
+        "Cannot launch rocket without fuel! Please add a fuel tank to your rocket design."
+      );
+      return;
+    }
     navigateTo("/launch");
   };
 
@@ -291,7 +298,7 @@ export default function RocketBuilder() {
                     height={64}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      // Fallback to emoji if image fails to load
+                      // Fallback to rocket PNG if image fails to load
                       e.currentTarget.style.display = "none";
                       const nextElement = e.currentTarget
                         .nextElementSibling as HTMLElement;
@@ -300,7 +307,13 @@ export default function RocketBuilder() {
                       }
                     }}
                   />
-                  <div className="text-2xl hidden">🚀</div>
+                  <Image
+                    src="/rocket.png"
+                    alt="Rocket"
+                    width={24}
+                    height={24}
+                    className="hidden"
+                  />
                 </div>
                 <div className="text-white text-sm font-medium">
                   {part.name}
@@ -350,8 +363,15 @@ export default function RocketBuilder() {
               <span className="mr-2">←</span> Exit Assembly
             </button>
             <div className="text-center">
-              <h1 className="text-lg lg:text-2xl font-bold text-white truncate">
-                🚀 Assembly Station Alpha
+              <h1 className="text-lg lg:text-2xl font-bold text-white truncate flex items-center justify-center gap-2">
+                <Image
+                  src="/rocket.png"
+                  alt="Rocket"
+                  width={32}
+                  height={32}
+                  className="flex-shrink-0"
+                />
+                Assembly Station Alpha
               </h1>
               <div className="text-xs text-white/60">
                 Rocket Construction Facility
@@ -436,7 +456,15 @@ export default function RocketBuilder() {
                 </div>
 
                 <div className="relative z-10">
-                  <div className="text-8xl mb-6 opacity-30">🚀</div>
+                  <div className="mb-6 opacity-30 flex justify-center">
+                    <Image
+                      src="/rocket.png"
+                      alt="Rocket"
+                      width={128}
+                      height={128}
+                      className="w-32 h-32"
+                    />
+                  </div>
                   <div className="text-xl font-semibold mb-2">
                     Assembly Station Ready
                   </div>
@@ -516,7 +544,13 @@ export default function RocketBuilder() {
                             }
                           }}
                         />
-                        <div className="text-3xl hidden">🚀</div>
+                        <Image
+                          src="/rocket.png"
+                          alt="Rocket"
+                          width={48}
+                          height={48}
+                          className="hidden"
+                        />
                       </div>
                       <div className="text-xl font-bold mb-2">
                         🎯 Drop {draggedPart.name} here!
@@ -561,7 +595,13 @@ export default function RocketBuilder() {
                               }
                             }}
                           />
-                          <div className="text-2xl hidden">🚀</div>
+                          <Image
+                            src="/rocket.png"
+                            alt="Rocket"
+                            width={32}
+                            height={32}
+                            className="hidden"
+                          />
                         </div>
                         <div className="flex-1">
                           <div className="text-white font-bold text-lg">
@@ -755,9 +795,13 @@ export default function RocketBuilder() {
         <div className="mt-6">
           <button
             onClick={handleLaunch}
-            disabled={state.currentRocket.parts.length === 0}
+            disabled={
+              state.currentRocket.parts.length === 0 ||
+              state.currentRocket.fuel <= 0
+            }
             className={`w-full py-5 px-6 rounded-2xl text-xl font-bold transition-all duration-300 relative overflow-hidden ${
-              state.currentRocket.parts.length > 0
+              state.currentRocket.parts.length > 0 &&
+              state.currentRocket.fuel > 0
                 ? "bg-gradient-to-r from-pink-500 via-pink-600 to-pink-700 text-white hover:from-pink-600 hover:via-pink-700 hover:to-pink-800 hover:scale-105 shadow-2xl hover:shadow-pink-500/25"
                 : "bg-gray-700/50 text-gray-400 cursor-not-allowed border border-gray-600/50"
             }`}
@@ -768,21 +812,33 @@ export default function RocketBuilder() {
                   : "none",
             }}
           >
-            {state.currentRocket.parts.length > 0 ? (
+            {state.currentRocket.parts.length > 0 &&
+            state.currentRocket.fuel > 0 ? (
               <>
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 <div className="relative flex items-center justify-center">
-                  <span className="mr-3 text-2xl">🚀</span>
+                  <Image
+                    src="/rocket.png"
+                    alt="Rocket"
+                    width={32}
+                    height={32}
+                    className="mr-3"
+                  />
                   <span>INITIATE LAUNCH SEQUENCE</span>
                 </div>
                 <div className="text-sm mt-1 opacity-80">
                   Mission Control Ready
                 </div>
               </>
-            ) : (
+            ) : state.currentRocket.parts.length === 0 ? (
               <div className="flex items-center justify-center">
                 <span className="mr-3 text-2xl">🔧</span>
                 <span>ASSEMBLE ROCKET FIRST</span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center">
+                <span className="mr-3 text-2xl">⛽</span>
+                <span>ADD FUEL TO LAUNCH</span>
               </div>
             )}
           </button>
@@ -792,12 +848,26 @@ export default function RocketBuilder() {
               <div className="text-xs text-white/60 mb-1">Launch Readiness</div>
               <div className="w-full bg-gray-700/50 rounded-full h-2">
                 <div
-                  className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all duration-1000"
-                  style={{ width: "100%" }}
+                  className={`h-2 rounded-full transition-all duration-1000 ${
+                    state.currentRocket.fuel > 0
+                      ? "bg-gradient-to-r from-green-500 to-emerald-500"
+                      : "bg-gradient-to-r from-red-500 to-orange-500"
+                  }`}
+                  style={{
+                    width: state.currentRocket.fuel > 0 ? "100%" : "50%",
+                  }}
                 />
               </div>
-              <div className="text-xs text-green-400 mt-1 font-medium">
-                ✅ READY FOR LAUNCH
+              <div
+                className={`text-xs mt-1 font-medium ${
+                  state.currentRocket.fuel > 0
+                    ? "text-green-400"
+                    : "text-red-400"
+                }`}
+              >
+                {state.currentRocket.fuel > 0
+                  ? "✅ READY FOR LAUNCH"
+                  : "❌ NEEDS FUEL"}
               </div>
             </div>
           )}

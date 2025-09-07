@@ -26,8 +26,8 @@ export default function AITutor({ className = "" }: AITutorProps) {
   const [inputText, setInputText] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({
-    x: typeof window !== "undefined" ? window.innerWidth - 100 : 20,
-    y: typeof window !== "undefined" ? window.innerHeight - 100 : 20,
+    x: 20,
+    y: 20,
   });
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isTyping, setIsTyping] = useState(false);
@@ -43,6 +43,14 @@ export default function AITutor({ className = "" }: AITutorProps) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Set initial position after hydration to avoid server/client mismatch
+  useEffect(() => {
+    setPosition({
+      x: window.innerWidth - 100,
+      y: window.innerHeight - 100,
+    });
+  }, []);
 
   // Handle window resize to keep position in bounds
   useEffect(() => {
