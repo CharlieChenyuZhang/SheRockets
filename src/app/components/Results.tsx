@@ -4,7 +4,7 @@ import { useGame } from "./GameProvider";
 import { useState } from "react";
 
 export default function Results() {
-  const { state, dispatch } = useGame();
+  const { state, dispatch, navigateTo } = useGame();
   const [aiMessage, setAiMessage] = useState("");
 
   // Calculate mission results
@@ -29,21 +29,21 @@ export default function Results() {
       return (
         "Your rocket was a bit too heavy for its engine! The thrust-to-weight ratio was " +
         thrustToWeight.toFixed(2) +
-        ". You need at least 1.0 to escape Earth's gravity. Try adding a bigger engine or using lighter parts! Don't worry - every great scientist learns from their experiments! 🌟"
+        ". You need at least 1.0 to escape Earth's gravity. Try adding a more powerful engine or using lighter materials! Don't worry - every great engineer learns from their tests! 🚀"
       );
     } else if (state.currentRocket.fuel === 0) {
-      return "You forgot to add fuel! Even the most beautiful engine can't work without fuel. Make sure to include a fuel tank in your design. This is a common mistake that even experienced engineers make! 💫";
+      return "You forgot to add fuel! Even the most advanced engine can't work without fuel. Make sure to include a fuel tank in your design. This is a common mistake that even experienced engineers make! ⛽";
     } else if (state.currentRocket.mass > 200) {
-      return "Your rocket was quite heavy! While it had enough thrust, lighter rockets are more efficient and graceful. Try using lighter parts or adding wings to reduce drag. You're thinking like a real engineer! 👩‍🔬";
+      return "Your rocket was quite heavy! While it had enough thrust, lighter rockets are more efficient and perform better. Try using lighter materials or adding aerodynamic features to reduce drag. You're thinking like a real aerospace engineer! 🛩️";
     } else if (state.currentRocket.drag > 15) {
-      return "Your rocket had a lot of drag! This made it less efficient. Wings can help, but too many can slow you down. Finding the right balance is part of the fun! You're learning important design principles! ✨";
+      return "Your rocket had a lot of drag! This made it less efficient. Stabilizing fins can help, but too many can slow you down. Finding the right balance is part of the engineering process! You're learning important design principles! 📐";
     } else {
-      return "Amazing design! Your rocket had perfect balance between thrust, weight, and fuel. The physics principles you used are the same ones real rocket scientists use! You're a natural engineer! 🚀";
+      return "Excellent design! Your rocket had perfect balance between thrust, weight, and fuel. The physics principles you used are the same ones real rocket engineers use! You're a natural aerospace engineer! 🚀";
     }
   };
 
   const handleRetry = () => {
-    dispatch({ type: "SET_VIEW", payload: "rocket-builder" });
+    navigateTo("/builder");
   };
 
   const handleNextLevel = () => {
@@ -54,15 +54,15 @@ export default function Results() {
         attemptsMade: state.playerProgress.attemptsMade + 1,
       },
     });
-    dispatch({ type: "SET_VIEW", payload: "level-map" });
+    navigateTo("/menu");
   };
 
-  const handleBackToMap = () => {
-    dispatch({ type: "SET_VIEW", payload: "level-map" });
+  const handleBackToMenu = () => {
+    navigateTo("/menu");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-pink-900 to-indigo-900 flex items-center justify-center p-8">
+    <div className="min-h-screen bg-black flex items-center justify-center p-8">
       {/* Background Stars */}
       <div className="absolute inset-0">
         {[...Array(50)].map((_, i) => (
@@ -81,41 +81,41 @@ export default function Results() {
 
       <div className="relative z-10 max-w-4xl w-full">
         {/* Mission Status Card */}
-        <div className="bg-black/40 backdrop-blur-sm rounded-2xl p-8 border border-pink-400/30 mb-8">
+        <div className="bg-gray-900/60 backdrop-blur-sm rounded-2xl p-8 border border-pink-500/30 mb-8">
           <div className="text-center">
             <div className="text-6xl mb-4">{isSuccess ? "🚀" : "💫"}</div>
             <h1 className="text-4xl font-bold text-white mb-2">
               {isSuccess ? "Mission Success!" : "Learning Opportunity!"}
             </h1>
-            <p className="text-xl text-pink-200 mb-6">
+            <p className="text-xl text-pink-300 mb-6">
               {isSuccess
                 ? "Congratulations! Your rocket design worked perfectly!"
-                : "Every experiment teaches us something valuable! You're growing as a scientist!"}
+                : "Every test teaches us something valuable! You're growing as an engineer!"}
             </p>
           </div>
 
           {/* Stats Summary */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-400">
+              <div className="text-3xl font-bold text-pink-400">
                 {maxAltitude}m
               </div>
               <div className="text-white/70 text-sm">Max Altitude</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-400">
+              <div className="text-3xl font-bold text-pink-300">
                 {state.currentRocket.mass}kg
               </div>
               <div className="text-white/70 text-sm">Total Mass</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-red-400">
+              <div className="text-3xl font-bold text-pink-200">
                 {state.currentRocket.thrust}N
               </div>
               <div className="text-white/70 text-sm">Total Thrust</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-400">
+              <div className="text-3xl font-bold text-pink-100">
                 {fuelEfficiency}%
               </div>
               <div className="text-white/70 text-sm">Fuel Efficiency</div>
@@ -123,7 +123,7 @@ export default function Results() {
           </div>
 
           {/* Detailed Stats */}
-          <div className="bg-white/10 rounded-lg p-6 mb-6">
+          <div className="bg-gray-800/50 rounded-lg p-6 mb-6">
             <h3 className="text-white font-bold text-lg mb-4">
               Rocket Analysis
             </h3>
@@ -157,9 +157,9 @@ export default function Results() {
         </div>
 
         {/* AI Feedback Panel */}
-        <div className="bg-black/40 backdrop-blur-sm rounded-2xl p-6 border border-pink-400/30 mb-8">
+        <div className="bg-gray-900/60 backdrop-blur-sm rounded-2xl p-6 border border-pink-500/30 mb-8">
           <div className="flex items-start space-x-4">
-            <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center text-2xl">
+            <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-pink-600 rounded-full flex items-center justify-center text-2xl">
               🌙
             </div>
             <div className="flex-1">
@@ -183,21 +183,21 @@ export default function Results() {
         <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
           <button
             onClick={handleRetry}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl text-lg font-bold transition-all hover:scale-105"
+            className="bg-gray-600 hover:bg-gray-700 text-white px-8 py-4 rounded-xl text-lg font-bold transition-all hover:scale-105"
           >
             🔄 Try Again
           </button>
           <button
             onClick={handleNextLevel}
-            className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-xl text-lg font-bold transition-all hover:scale-105"
+            className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-4 rounded-xl text-lg font-bold transition-all hover:scale-105"
           >
             🌟 Next Level
           </button>
           <button
-            onClick={handleBackToMap}
+            onClick={handleBackToMenu}
             className="bg-gray-600 hover:bg-gray-700 text-white px-8 py-4 rounded-xl text-lg font-bold transition-all hover:scale-105"
           >
-            🗺️ Back to Map
+            🏠 Back to Menu
           </button>
         </div>
 
