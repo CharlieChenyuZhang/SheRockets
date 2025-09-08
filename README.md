@@ -91,6 +91,63 @@ npm run dev
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
+## AI Tutor Testing
+
+To test the AI tutor functionality locally, you need to have the AI tutor server running:
+
+### Prerequisites for AI Tutor
+
+- The AI tutor server must be running at `chenyuzhang.com/server`
+- Node.js 18+ (already required above)
+
+### Setting up AI Tutor Testing
+
+1. **Configure Environment Variables**:
+
+   Create a `.env.local` file in the project root:
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Update `.env.local` with the AI tutor server URL:
+
+   ```env
+   # For local testing with chenyuzhang.com/server
+   NEXT_PUBLIC_AI_TUTOR_API_URL=https://chenyuzhang.com/server
+   ```
+
+2. **Start the AI Tutor Server**:
+
+   Make sure the AI tutor server is running at `chenyuzhang.com/server` before testing.
+
+3. **Test the AI Tutor Integration**:
+
+   Run the test script to verify the connection:
+
+   ```bash
+   node test-ai-tutor-api.js
+   ```
+
+   This will test the API connection and display the AI tutor's response.
+
+4. **Test in the Application**:
+
+   - Start the development server: `npm run dev`
+   - Open [http://localhost:3000](http://localhost:3000)
+   - Navigate to any page with the AI tutor (Dr. Luna)
+   - Click on the AI tutor icon and ask a question
+   - The AI tutor should respond with helpful guidance
+
+### AI Tutor Features
+
+- **Dr. Luna**: Your supportive AI companion for space science learning
+- **Contextual Help**: Provides physics explanations and rocket building guidance
+- **Conversation History**: Maintains context throughout your learning session
+- **Fallback Support**: Uses built-in responses if the server is unavailable
+
+For detailed AI tutor setup information, see [AI_TUTOR_SETUP.md](AI_TUTOR_SETUP.md).
+
 ### Building for Production
 
 ```bash
