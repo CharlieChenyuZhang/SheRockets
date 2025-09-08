@@ -9,6 +9,26 @@ interface Message {
   timestamp: Date;
 }
 
+interface AIRequestPayload {
+  inputText: string;
+  conversation: Array<{
+    isUser: boolean;
+    text: string;
+  }>;
+  subject: string;
+  difficulty: string;
+  language: string;
+  userId: string;
+}
+
+interface AIResponse {
+  response: string;
+  subject: string;
+  difficulty: string;
+  timestamp: string;
+  conversationId: string;
+}
+
 interface AITutorProps {
   className?: string;
 }
@@ -33,6 +53,10 @@ export default function AITutor({ className = "" }: AITutorProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [mouseDownTime, setMouseDownTime] = useState(0);
   const [hasMoved, setHasMoved] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [userId] = useState(
+    () => `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  );
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -133,8 +157,10 @@ export default function AITutor({ className = "" }: AITutorProps) {
     }
   }, [isDragging, handleDragMove, handleDragEnd]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputText.trim()) return;
+
+    console.log("AI Tutor: Starting to send message:", inputText);
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -144,21 +170,91 @@ export default function AITutor({ className = "" }: AITutorProps) {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const currentInput = inputText;
     setInputText("");
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse = generateAIResponse(inputText);
+    // Prepare conversation history (including the current message we just added)
+    const conversationHistory = [...messages, userMessage].map((msg) => ({
+      isUser: msg.isUser,
+      text: msg.text,
+    }));
+
+    const payload: AIRequestPayload = {
+      inputText: currentInput,
+      conversation: conversationHistory,
+      subject: "Space Science",
+      difficulty: "beginner",
+      language: "en",
+      userId: userId,
+    };
+
+    const apiUrl =
+      process.env.NEXT_PUBLIC_AI_TUTOR_API_URL || "http://localhost:8080";
+
+    try {
+      console.log(
+        "AI Tutor: Making API request to:",
+        `${apiUrl}/api/sherockets-tutor`
+      );
+      console.log("AI Tutor: Payload:", payload);
+      console.log(
+        "AI Tutor: Environment check - NEXT_PUBLIC_AI_TUTOR_API_URL:",
+        process.env.NEXT_PUBLIC_AI_TUTOR_API_URL
+      );
+
+      const response = await fetch(`${apiUrl}/api/sherockets-tutor`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `API request failed: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const aiResponse: AIResponse = await response.json();
+      console.log("AI Tutor: API Success! Response:", aiResponse);
+
+      // Update conversation ID if provided
+      if (aiResponse.conversationId) {
+        setConversationId(aiResponse.conversationId);
+      }
+
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: aiResponse,
+        text: aiResponse.response,
         isUser: false,
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error("Error calling AI tutor API:", error);
+      console.error("Error details:", {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        apiUrl: `${apiUrl}/api/sherockets-tutor`,
+        payload: payload,
+      });
+
+      // Fallback to mock response if API fails
+      const fallbackResponse = generateAIResponse(currentInput);
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: `⚠️ API Connection Issue: ${fallbackResponse}`,
+        isUser: false,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+    }
   };
 
   const generateAIResponse = (userInput: string): string => {

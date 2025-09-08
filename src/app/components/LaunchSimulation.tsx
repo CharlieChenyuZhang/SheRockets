@@ -147,15 +147,40 @@ export default function LaunchSimulation() {
   const fuelCapacity = state.currentRocket.fuel;
   const drag = state.currentRocket.drag;
 
-  // Calculate thrust-to-weight ratio
-  const thrustToWeight = thrust / (rocketMass * 9.81);
+  // Calculate thrust-to-weight ratio with proper fuel mass
+  const fuelDensity = 0.8; // kg/L for kerosene-based fuel
+  const fuelMass = fuelCapacity * fuelDensity;
+  const totalMass = rocketMass + fuelMass;
+  const thrustToWeight = thrust / (totalMass * 9.81);
 
-  // Calculate specific impulse (simplified)
-  const specificImpulse = 300; // seconds (typical for liquid fuel)
+  // Calculate specific impulse based on engine type (more realistic)
+  const engineTypes = state.currentRocket.parts.filter(
+    (p) => p.type === "engine"
+  );
+  let specificImpulse = 300; // Default for liquid fuel
+
+  if (engineTypes.length > 0) {
+    // Calculate average specific impulse based on engine types
+    const totalImpulse = engineTypes.reduce((sum, engine) => {
+      // Different engines have different Isp values
+      if (engine.id.includes("solid")) return sum + 250; // Solid fuel
+      if (engine.id.includes("nuclear")) return sum + 800; // Nuclear thermal
+      if (engine.id.includes("ion")) return sum + 3000; // Ion drive
+      if (
+        engine.id.includes("super-heavy") ||
+        engine.id.includes("moon-rocket")
+      )
+        return sum + 350; // Heavy engines
+      return sum + 300; // Default liquid fuel
+    }, 0);
+    specificImpulse = totalImpulse / engineTypes.length;
+  }
+
+  // Calculate fuel flow rate based on actual engine performance
   const fuelFlowRate =
     thrust > 0
-      ? (thrust / (specificImpulse * 9.81)) * 0.3 // kg/s - 0.3x for more forgiving gameplay
-      : 0.1; // Fallback fuel flow rate when no engines (for testing)
+      ? (thrust / (specificImpulse * 9.81)) * 0.5 // More realistic fuel consumption
+      : 0.1; // Fallback fuel flow rate when no engines
 
   // Debug initial values
   console.log(
@@ -169,14 +194,22 @@ export default function LaunchSimulation() {
   );
   console.log(`📊 Rocket Stats:`, {
     mass: rocketMass,
+    totalMass: totalMass,
     thrust,
     fuel: fuelCapacity,
     drag,
+    thrustToWeight: thrustToWeight.toFixed(3),
+    specificImpulse: specificImpulse.toFixed(0),
+    deltaV: (
+      specificImpulse *
+      9.81 *
+      Math.log((rocketMass + fuelMass) / rocketMass)
+    ).toFixed(0),
   });
 
   // Calculate delta-v capability
   const deltaV =
-    specificImpulse * 9.81 * Math.log((rocketMass + fuelCapacity) / rocketMass);
+    specificImpulse * 9.81 * Math.log((rocketMass + fuelMass) / rocketMass);
 
   useEffect(() => {
     if (simState.isLaunched && !simState.isComplete) {
@@ -230,13 +263,50 @@ export default function LaunchSimulation() {
             newAngle = 90;
           }
 
-          // Demo mode: Simple animation from Earth to Moon
+          // Demo mode: Realistic animation based on rocket capabilities
           if (isDemoMode) {
-            // Simple demo - just show smooth progress
-            newAltitude = newTime * 1000; // Simple altitude increase
-            newVelocity = 100; // Constant velocity
-            newHorizontalVelocity = 5000; // Constant horizontal velocity
-            newDistanceToMoon = Math.max(0, MOON_DISTANCE - newTime * 1000000); // Simple distance decrease
+            // Calculate realistic demo values based on rocket configuration
+            const deltaV =
+              specificImpulse *
+              9.81 *
+              Math.log((rocketMass + fuelMass) / rocketMass);
+            const capabilityFactor = Math.min(deltaV / 4000, 1); // Normalize to moon mission requirement
+
+            // Realistic altitude progression based on rocket capability
+            const progress = Math.min(newTime / 15, 1);
+            if (progress < 0.1) {
+              // Launch phase: 0 to 44km (Apollo launch to staging)
+              const launchProgress = progress / 0.1;
+              newAltitude = launchProgress * 44000 * capabilityFactor;
+            } else if (progress < 0.2) {
+              // Earth parking orbit: 44km to 170km
+              const orbitProgress = (progress - 0.1) / 0.1;
+              newAltitude = (44000 + orbitProgress * 126000) * capabilityFactor;
+            } else if (progress < 0.7) {
+              // Translunar injection: 170km to 185km
+              const transferProgress = (progress - 0.2) / 0.5;
+              newAltitude =
+                (170000 + transferProgress * 15000) * capabilityFactor;
+            } else if (progress < 0.9) {
+              // Lunar approach: 185km to 2.6km
+              const approachProgress = (progress - 0.7) / 0.2;
+              newAltitude =
+                (185000 - approachProgress * 182400) * capabilityFactor;
+            } else {
+              // Final landing: 2.6km to 0m
+              const landingProgress = (progress - 0.9) / 0.1;
+              newAltitude = (2600 - landingProgress * 2600) * capabilityFactor;
+            }
+
+            // Realistic velocity based on rocket thrust-to-weight ratio
+            const baseVelocity = Math.min(thrustToWeight * 2000, 12000);
+            newVelocity = baseVelocity * (1 - progress * 0.8); // Decrease as we approach moon
+            newHorizontalVelocity = baseVelocity * 0.8 * (1 - progress * 0.9);
+
+            // Realistic distance to moon based on rocket capability
+            const distanceProgress = Math.min(progress * capabilityFactor, 1);
+            const distanceCurve = 1 - Math.pow(distanceProgress, 1.5);
+            newDistanceToMoon = Math.max(0, MOON_DISTANCE * distanceCurve);
 
             // Complete mission after 15 seconds
             if (newTime >= 15) {
@@ -252,14 +322,31 @@ export default function LaunchSimulation() {
             if (prev.missionPhase === "launch") {
               if (hasFuel && prev.altitude < 100000) {
                 // Apply thrust - use actual rocket physics
-                const currentMass = rocketMass + prev.fuel; // Fuel is in liters, assume 1L = 1kg
-                const acceleration = thrust / currentMass - 9.81; // Thrust minus gravity
-                newVelocity += acceleration * dt; // Realistic acceleration
-                newHorizontalVelocity += (thrust / currentMass) * 0.1 * dt; // Build horizontal velocity
+                const currentFuelMass = prev.fuel * fuelDensity;
+                const currentMass = rocketMass + currentFuelMass;
+
+                // Calculate net acceleration (thrust minus gravity minus drag)
+                const gravityAcceleration = 9.81;
+                const dragAcceleration =
+                  (drag * newVelocity * newVelocity) / (currentMass * 1000); // Simplified drag model
+                const thrustAcceleration = thrust / currentMass;
+                const netAcceleration =
+                  thrustAcceleration - gravityAcceleration - dragAcceleration;
+
+                newVelocity += netAcceleration * dt;
+
+                // Build horizontal velocity based on rocket angle and thrust
+                const horizontalThrustComponent =
+                  (thrust * Math.sin((newAngle * Math.PI) / 180)) / currentMass;
+                newHorizontalVelocity += horizontalThrustComponent * dt;
+
                 newAltitude = Math.max(0, prev.altitude + newVelocity * dt);
               } else if (prev.altitude > 0) {
                 // No fuel but rocket is in the air - ballistic trajectory
-                newVelocity -= 9.81 * dt; // Gravity
+                const currentMass = rocketMass; // No fuel mass when out of fuel
+                const dragAcceleration =
+                  (drag * newVelocity * newVelocity) / (currentMass * 1000);
+                newVelocity -= (9.81 + dragAcceleration) * dt; // Gravity + drag
                 newAltitude = Math.max(0, prev.altitude + newVelocity * dt);
               } else {
                 // No fuel and on the ground - rocket cannot move
@@ -324,16 +411,27 @@ export default function LaunchSimulation() {
 
             // Phase 3: Transfer (coast to moon)
             else if (prev.missionPhase === "transfer") {
-              // Realistic transfer - calculate distance based on actual position
+              // Realistic transfer - calculate distance based on actual delta-v capability
               newAltitude += 200 * dt; // Continue climbing
 
-              // Calculate realistic distance to moon based on progress
+              // Calculate realistic distance to moon based on rocket's delta-v capability
+              const deltaV =
+                specificImpulse *
+                9.81 *
+                Math.log((rocketMass + fuelMass) / rocketMass);
               const transferProgress = Math.min((newTime - 25) / 20, 1); // 20 seconds for transfer
-              const currentDistance = MOON_DISTANCE * (1 - transferProgress);
+
+              // Distance reduction based on rocket capability and time
+              const capabilityFactor = Math.min(deltaV / 4000, 1); // Normalize to moon mission requirement
+              const timeFactor = transferProgress;
+              const combinedProgress =
+                capabilityFactor * 0.7 + timeFactor * 0.3; // Weighted by rocket capability
+
+              const currentDistance = MOON_DISTANCE * (1 - combinedProgress);
 
               // Add some orbital mechanics - distance doesn't decrease linearly
               const orbitalFactor =
-                Math.sin(transferProgress * Math.PI * 2) * 0.1; // Small oscillation
+                Math.sin(transferProgress * Math.PI * 2) * 0.05; // Smaller oscillation
               newDistanceToMoon = Math.max(
                 LUNAR_ORBIT_ALTITUDE,
                 currentDistance + orbitalFactor * MOON_DISTANCE
@@ -344,8 +442,11 @@ export default function LaunchSimulation() {
                 newMissionPhase = "lunar_approach";
               }
 
-              // Check for transfer failure (too much time)
-              if (newTime > 200 && newDistanceToMoon > MOON_DISTANCE * 0.5) {
+              // Check for transfer failure (too much time or insufficient delta-v)
+              if (
+                (newTime > 200 && newDistanceToMoon > MOON_DISTANCE * 0.5) ||
+                (deltaV < 2000 && newTime > 100)
+              ) {
                 isComplete = true;
                 success = false;
                 newMissionPhase = "failed";
@@ -582,6 +683,8 @@ export default function LaunchSimulation() {
     deltaV,
     fuelFlowRate,
     isDemoMode,
+    fuelMass,
+    specificImpulse,
   ]);
 
   const handleLaunch = () => {
@@ -673,7 +776,7 @@ export default function LaunchSimulation() {
     }));
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!chatInput.trim()) return;
 
     const userMessage = {
@@ -684,35 +787,282 @@ export default function LaunchSimulation() {
     };
 
     setChatMessages((prev) => [...prev, userMessage]);
+    const currentInput = chatInput.trim();
     setChatInput("");
     setIsTyping(true);
 
-    // Simulate AI response after a delay
-    setTimeout(() => {
-      const responses = [
-        "Great question! That's a fundamental concept in rocket science. Let me explain... 🚀",
-        "Excellent! I love seeing students think about the physics behind space travel. Here's what's happening... ✨",
-        "That's a perfect question for understanding rocket dynamics! The key principle is... 🌟",
-        "Wonderful! You're thinking like a real rocket scientist. Let me break this down for you... 🛰️",
-        "I'm so excited you asked that! This is exactly the kind of thinking that leads to breakthroughs in space exploration... 🌌",
-        "Fantastic question! This touches on some of the most important concepts in aerospace engineering... 🚀",
-        "You're asking the right questions! Understanding this will help you become a better rocket designer... ⭐",
-        "That's a brilliant observation! Let me explain the science behind this phenomenon... 🌙",
-      ];
+    // Prepare conversation history (including the current message we just added)
+    const conversationHistory = [...chatMessages, userMessage].map((msg) => ({
+      isUser: msg.isUser,
+      text: msg.text,
+    }));
 
-      const randomResponse =
-        responses[Math.floor(Math.random() * responses.length)];
+    // Create enhanced context with rocket and simulation data
+    const rocketContext = {
+      // Current rocket configuration
+      rocket: {
+        mass: state.currentRocket.mass,
+        thrust: state.currentRocket.thrust,
+        fuel: state.currentRocket.fuel,
+        drag: state.currentRocket.drag,
+        parts: state.currentRocket.parts.map((part) => ({
+          name: part.name,
+          type: part.type,
+          id: part.id,
+        })),
+      },
+      // Current simulation state
+      simulation: {
+        altitude: Math.round(simState.altitude),
+        velocity: Math.round(simState.velocity),
+        horizontalVelocity: Math.round(simState.horizontalVelocity),
+        angle: Math.round(simState.angle),
+        fuel: Math.round(simState.fuel),
+        time: Math.round(simState.time * 10) / 10,
+        missionPhase: simState.missionPhase,
+        distanceToMoon: Math.round(simState.distanceToMoon / 1000), // Convert to km
+        isLaunched: simState.isLaunched,
+        isComplete: simState.isComplete,
+        success: simState.success,
+      },
+      // Calculated physics data
+      physics: {
+        thrustToWeight: Math.round(thrustToWeight * 100) / 100,
+        specificImpulse: Math.round(specificImpulse),
+        deltaV: Math.round(deltaV),
+        fuelFlowRate: Math.round(fuelFlowRate * 100) / 100,
+        totalMass: Math.round(totalMass),
+      },
+    };
+
+    // Create enhanced input text with context
+    const enhancedInputText = `${currentInput}
+
+CONTEXT: I'm currently in a rocket simulation with the following setup:
+- Mission Phase: ${simState.missionPhase}
+- Altitude: ${Math.round(simState.altitude)}m
+- Velocity: ${Math.round(simState.velocity)}m/s
+- Fuel Remaining: ${Math.round(simState.fuel)}L
+- Distance to Moon: ${Math.round(simState.distanceToMoon / 1000)}km
+- Rocket Mass: ${state.currentRocket.mass}kg
+- Thrust: ${state.currentRocket.thrust}N
+- Thrust-to-Weight Ratio: ${Math.round(thrustToWeight * 100) / 100}
+- Delta-V: ${Math.round(deltaV)}m/s
+- Rocket Parts: ${state.currentRocket.parts.map((p) => p.name).join(", ")}
+
+Please provide guidance based on my current rocket configuration and mission status.`;
+
+    const payload = {
+      inputText: enhancedInputText,
+      conversation: conversationHistory,
+      subject: "Space Science",
+      difficulty: "beginner",
+      language: "en",
+      userId: `launch_sim_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}`,
+      context: rocketContext,
+    };
+
+    const apiUrl =
+      process.env.NEXT_PUBLIC_AI_TUTOR_API_URL || "http://localhost:8080";
+
+    try {
+      console.log(
+        "LaunchSimulation AI Tutor: Making API request to:",
+        `${apiUrl}/api/sherockets-tutor`
+      );
+      console.log("LaunchSimulation AI Tutor: Payload:", payload);
+
+      const response = await fetch(`${apiUrl}/api/sherockets-tutor`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `API request failed: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const aiResponse = await response.json();
+      console.log(
+        "LaunchSimulation AI Tutor: API Success! Response:",
+        aiResponse
+      );
 
       const aiMessage = {
         id: (Date.now() + 1).toString(),
-        text: randomResponse,
+        text: aiResponse.response,
         isUser: false,
         timestamp: new Date(),
       };
 
       setChatMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error("Error calling AI tutor API:", error);
+      console.error("Error details:", {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        apiUrl: `${apiUrl}/api/sherockets-tutor`,
+        payload: payload,
+      });
+
+      // Fallback to mock response if API fails
+      const fallbackResponse = generateAIResponse(currentInput, rocketContext);
+      const aiMessage = {
+        id: (Date.now() + 1).toString(),
+        text: `⚠️ API Connection Issue: ${fallbackResponse}`,
+        isUser: false,
+        timestamp: new Date(),
+      };
+
+      setChatMessages((prev) => [...prev, aiMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
+  };
+
+  const generateAIResponse = (
+    userInput: string,
+    context?: {
+      rocket: {
+        mass: number;
+        thrust: number;
+        fuel: number;
+        drag: number;
+        parts: Array<{ name: string; type: string; id: string }>;
+      };
+      simulation: {
+        altitude: number;
+        velocity: number;
+        horizontalVelocity: number;
+        angle: number;
+        fuel: number;
+        time: number;
+        missionPhase: string;
+        distanceToMoon: number;
+        isLaunched: boolean;
+        isComplete: boolean;
+        success: boolean;
+      };
+      physics: {
+        thrustToWeight: number;
+        specificImpulse: number;
+        deltaV: number;
+        fuelFlowRate: number;
+        totalMass: number;
+      };
+    }
+  ): string => {
+    const input = userInput.toLowerCase();
+
+    // Context-aware responses based on current simulation state
+    if (context) {
+      const { simulation, rocket, physics } = context;
+
+      if (input.includes("help") || input.includes("stuck")) {
+        if (simulation.missionPhase === "launch") {
+          return `I can see you're in the launch phase! 🚀 Your rocket has a thrust-to-weight ratio of ${
+            physics.thrustToWeight
+          }. ${
+            physics.thrustToWeight < 1
+              ? "You might need more thrust or less weight to get off the ground!"
+              : "That looks good for launch!"
+          } Your current altitude is ${simulation.altitude}m and velocity is ${
+            simulation.velocity
+          }m/s. Keep an eye on your fuel - you have ${
+            simulation.fuel
+          }L remaining!`;
+        } else if (simulation.missionPhase === "orbit") {
+          return `Great job reaching orbit! 🌍 You're at ${simulation.altitude}m altitude with ${simulation.velocity}m/s velocity. Your horizontal velocity of ${simulation.horizontalVelocity}m/s is building up for orbital mechanics. You have ${simulation.fuel}L of fuel left - use it wisely for the next phase!`;
+        } else if (simulation.missionPhase === "transfer") {
+          return `Excellent! You're in the transfer phase! 🌙 You're ${
+            simulation.distanceToMoon
+          }km from the Moon. Your delta-v of ${physics.deltaV}m/s ${
+            physics.deltaV > 4000
+              ? "should be sufficient"
+              : "might be challenging"
+          } for a lunar mission. Keep monitoring your fuel consumption!`;
+        }
+      }
+
+      if (input.includes("fuel") || input.includes("engine")) {
+        return `Your rocket has ${
+          simulation.fuel
+        }L of fuel remaining with a fuel flow rate of ${
+          physics.fuelFlowRate
+        } kg/s. Your engines are producing ${
+          rocket.thrust
+        }N of thrust, giving you a thrust-to-weight ratio of ${
+          physics.thrustToWeight
+        }. ${
+          simulation.fuel < 100
+            ? "⚠️ Low fuel warning! Consider your next moves carefully."
+            : "Your fuel levels look good for now!"
+        }`;
+      }
+
+      if (input.includes("velocity") || input.includes("speed")) {
+        return `Your current velocity is ${
+          simulation.velocity
+        }m/s with a horizontal component of ${
+          simulation.horizontalVelocity
+        }m/s. You're in the ${simulation.missionPhase} phase. ${
+          simulation.missionPhase === "launch" && simulation.velocity < 1000
+            ? "You're still in the early launch phase - keep building that velocity!"
+            : "Your velocity looks good for this phase!"
+        }`;
+      }
+
+      if (input.includes("altitude") || input.includes("height")) {
+        return `You're currently at ${simulation.altitude}m altitude in the ${
+          simulation.missionPhase
+        } phase. ${
+          simulation.altitude < 100000
+            ? "You're still in the atmosphere - keep climbing!"
+            : "Great job reaching space altitude!"
+        } Your distance to the Moon is ${simulation.distanceToMoon}km.`;
+      }
+    }
+
+    // General responses (fallback)
+    if (input.includes("rocket") || input.includes("launch")) {
+      return "Great question about rockets! 🚀 Rockets work using Newton's Third Law - for every action, there's an equal and opposite reaction. When the rocket pushes exhaust gases down, the gases push the rocket up! The more fuel you burn, the more thrust you get. Want to learn about different rocket parts?";
+    }
+
+    if (input.includes("physics") || input.includes("science")) {
+      return "Physics is amazing! 🌟 It's the study of how things move and interact. In space, we deal with gravity, momentum, and energy. Did you know that in space, you can't hear sounds because there's no air? That's why we see explosions but don't hear them in movies! What specific physics concept interests you?";
+    }
+
+    if (input.includes("space") || input.includes("planet")) {
+      return "Space is incredible! 🌌 There are 8 planets in our solar system, and each one is unique. Earth is special because it has water and air that we can breathe. Mars is red because of iron oxide (rust) on its surface! Would you like to learn about building a rocket to visit other planets?";
+    }
+
+    if (input.includes("hello") || input.includes("hi")) {
+      return "Hello, future astronaut! 👩‍🚀 I'm so excited to help you on your space journey! I'm Dr. Luna, and I've been studying space science for many years. What's your name, and what would you like to explore today?";
+    }
+
+    if (input.includes("gravity") || input.includes("weight")) {
+      return "Gravity is fascinating! 🌍 It's the invisible force that pulls everything toward Earth. To escape Earth's gravity, rockets need to reach about 25,000 mph! That's why we need powerful engines and lots of fuel. The bigger your rocket, the more fuel you'll need to fight gravity!";
+    }
+
+    if (input.includes("mars") || input.includes("moon")) {
+      return "Exploring other worlds is so exciting! 🌙🚀 The Moon is much closer than Mars, but Mars has an atmosphere (though very thin). Each destination requires different rocket designs. What would you like to know about space travel to these amazing places?";
+    }
+
+    // Default responses
+    const responses = [
+      "That's a wonderful question! 🤔 Let me think about that... In space science, we're always learning new things. Can you tell me more about what you're curious about?",
+      "I love your curiosity! ✨ That reminds me of when I was learning about space. Have you tried experimenting with different rocket designs? Sometimes the best way to learn is by trying!",
+      "What an interesting thought! 🌟 You know, many famous scientists started with questions just like yours. What made you think about that?",
+      "Great thinking! 🚀 You're developing the mind of a true scientist. Have you considered how this might relate to your rocket building?",
+    ];
+
+    return responses[Math.floor(Math.random() * responses.length)];
   };
 
   const handleChatKeyPress = (e: React.KeyboardEvent) => {
@@ -1434,7 +1784,7 @@ export default function LaunchSimulation() {
               )}
 
               {/* Demo Mode Button */}
-              {!simState.isLaunched && (
+              {/* {!simState.isLaunched && (
                 <button
                   onClick={handleDemoMode}
                   className="bg-purple-500/80 hover:bg-purple-500 backdrop-blur-xl text-white px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 shadow-xl border border-purple-400/30 w-full"
@@ -1444,7 +1794,7 @@ export default function LaunchSimulation() {
                     <span>Demo Mode</span>
                   </span>
                 </button>
-              )}
+              )} */}
 
               {/* Retry Button */}
               <button
@@ -1471,7 +1821,7 @@ export default function LaunchSimulation() {
               </button>
 
               {/* Continue Button */}
-              {simState.isComplete && (
+              {/* {simState.isComplete && (
                 <button
                   data-testid="continue-button"
                   onClick={handleContinue}
@@ -1482,7 +1832,7 @@ export default function LaunchSimulation() {
                     <span>→</span>
                   </span>
                 </button>
-              )}
+              )} */}
             </div>
           </div>
         </div>

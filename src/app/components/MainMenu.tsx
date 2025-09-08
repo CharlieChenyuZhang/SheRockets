@@ -39,14 +39,14 @@ export default function MainMenu() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60"></div>
       </div>
 
-      {/* Settings Button */}
-      <button
+      {/* Settings Button - Commented out */}
+      {/* <button
         onClick={handleSettings}
         className="absolute top-4 right-4 text-white text-2xl hover:scale-110 transition-transform bg-pink-500/20 hover:bg-pink-500/30 rounded-full w-12 h-12 flex items-center justify-center border border-pink-400/30"
         title="Settings"
       >
         ⚙
-      </button>
+      </button> */}
 
       {/* Main Content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-8">
@@ -78,7 +78,8 @@ export default function MainMenu() {
             Start Rocket Mission
           </button>
 
-          <button
+          {/* Continue Mission Button - Commented out */}
+          {/* <button
             onClick={handleContinue}
             disabled={!state.lastSavedState}
             onMouseEnter={() => setIsHovered("continue")}
@@ -94,7 +95,7 @@ export default function MainMenu() {
             }`}
           >
             Continue Mission
-          </button>
+          </button> */}
         </div>
 
         {/* Decorative Elements */}

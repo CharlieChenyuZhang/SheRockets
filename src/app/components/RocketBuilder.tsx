@@ -76,6 +76,24 @@ const availableParts: RocketPart[] = [
     icon: "",
   },
   {
+    id: "nuclear-engine",
+    name: "Nuclear Thermal Engine",
+    type: "engine",
+    weight: 150,
+    thrust: 12000,
+    unlocked: true,
+    icon: "",
+  },
+  {
+    id: "ion-engine",
+    name: "Ion Drive Engine",
+    type: "engine",
+    weight: 50,
+    thrust: 2000,
+    unlocked: true,
+    icon: "",
+  },
+  {
     id: "fins",
     name: "Stabilizing Fins",
     type: "wings",
@@ -135,6 +153,24 @@ const availableParts: RocketPart[] = [
     type: "fuel",
     weight: 200,
     fuelCapacity: 15000,
+    unlocked: true,
+    icon: "",
+  },
+  {
+    id: "advanced-fuel-tank",
+    name: "Advanced Composite Tank",
+    type: "fuel",
+    weight: 100,
+    fuelCapacity: 8000,
+    unlocked: true,
+    icon: "",
+  },
+  {
+    id: "lightweight-tank",
+    name: "Lightweight Aluminum Tank",
+    type: "fuel",
+    weight: 60,
+    fuelCapacity: 5000,
     unlocked: true,
     icon: "",
   },
@@ -777,11 +813,12 @@ export default function RocketBuilder() {
               </div>
 
               {(() => {
+                // Use realistic fuel density: 0.8 kg/L for kerosene-based fuel
+                const fuelDensity = 0.8; // kg/L
+                const fuelMass = state.currentRocket.fuel * fuelDensity;
                 const thrustToWeight =
                   state.currentRocket.thrust /
-                  ((state.currentRocket.mass + state.currentRocket.fuel) *
-                    9.81);
-                const fuelMass = state.currentRocket.fuel; // Assuming 1L = 1kg
+                  ((state.currentRocket.mass + fuelMass) * 9.81);
                 const specificImpulse = 300;
                 const deltaV =
                   specificImpulse *
@@ -807,16 +844,13 @@ export default function RocketBuilder() {
                         </div>
                         <div className="text-blue-300">
                           = {state.currentRocket.thrust}N ÷ (
-                          {(
-                            state.currentRocket.mass + state.currentRocket.fuel
-                          ).toFixed(0)}
+                          {(state.currentRocket.mass + fuelMass).toFixed(0)}
                           kg × 9.81)
                         </div>
                         <div className="text-blue-300">
                           = {state.currentRocket.thrust}N ÷{" "}
                           {(
-                            (state.currentRocket.mass +
-                              state.currentRocket.fuel) *
+                            (state.currentRocket.mass + fuelMass) *
                             9.81
                           ).toFixed(0)}
                           N
@@ -831,16 +865,13 @@ export default function RocketBuilder() {
                         </div>
                         <div className="text-blue-300">
                           = 300s × 9.81 × ln(
-                          {(
-                            state.currentRocket.mass + state.currentRocket.fuel
-                          ).toFixed(0)}
+                          {(state.currentRocket.mass + fuelMass).toFixed(0)}
                           kg ÷ {state.currentRocket.mass}kg)
                         </div>
                         <div className="text-blue-300">
                           = 2943 × ln(
                           {(
-                            (state.currentRocket.mass +
-                              state.currentRocket.fuel) /
+                            (state.currentRocket.mass + fuelMass) /
                             state.currentRocket.mass
                           ).toFixed(2)}
                           )

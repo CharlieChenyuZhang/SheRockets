@@ -820,6 +820,195 @@ const getEngineIcon = (partId: string) => {
         </svg>
       );
 
+    case "nuclear-engine":
+      return (
+        <svg viewBox="0 0 100 100" className="w-full h-full">
+          <defs>
+            <linearGradient
+              id="nuclearEngineGrad"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" stopColor="#FEF2F2" />
+              <stop offset="50%" stopColor="#FECACA" />
+              <stop offset="100%" stopColor="#DC2626" />
+            </linearGradient>
+            <radialGradient id="nuclearFlameGrad" cx="50%" cy="100%" r="50%">
+              <stop offset="0%" stopColor="#FEF3C7" />
+              <stop offset="30%" stopColor="#FDE68A" />
+              <stop offset="70%" stopColor="#F59E0B" />
+              <stop offset="100%" stopColor="#DC2626" />
+            </radialGradient>
+            <filter
+              id="nuclearEngineShadow"
+              x="-20%"
+              y="-20%"
+              width="140%"
+              height="140%"
+            >
+              <feDropShadow
+                dx="0"
+                dy="3"
+                stdDeviation="4"
+                floodColor="#DC2626"
+                floodOpacity="0.4"
+              />
+            </filter>
+          </defs>
+          <ellipse
+            cx="50"
+            cy="20"
+            rx="12"
+            ry="8"
+            fill="url(#nuclearEngineGrad)"
+            filter="url(#nuclearEngineShadow)"
+          />
+          <ellipse
+            cx="50"
+            cy="30"
+            rx="16"
+            ry="10"
+            fill="url(#nuclearEngineGrad)"
+            filter="url(#nuclearEngineShadow)"
+          />
+          <ellipse
+            cx="50"
+            cy="40"
+            rx="20"
+            ry="12"
+            fill="url(#nuclearEngineGrad)"
+            filter="url(#nuclearEngineShadow)"
+          />
+          <ellipse
+            cx="50"
+            cy="60"
+            rx="24"
+            ry="15"
+            fill="url(#nuclearEngineGrad)"
+            filter="url(#nuclearEngineShadow)"
+          />
+          <ellipse
+            cx="50"
+            cy="80"
+            rx="20"
+            ry="12"
+            fill="url(#nuclearFlameGrad)"
+            opacity="0.9"
+          />
+          <ellipse
+            cx="50"
+            cy="87"
+            rx="16"
+            ry="10"
+            fill="#FDE68A"
+            opacity="0.7"
+          />
+          <ellipse
+            cx="50"
+            cy="92"
+            rx="12"
+            ry="8"
+            fill="#F59E0B"
+            opacity="0.5"
+          />
+          <circle cx="50" cy="10" r="3" fill="#FCD34D" />
+          <circle cx="50" cy="10" r="1.5" fill="#FEF3C7" />
+          <rect x="40" y="15" width="20" height="2" fill="#B91C1C" rx="1" />
+        </svg>
+      );
+
+    case "ion-engine":
+      return (
+        <svg viewBox="0 0 100 100" className="w-full h-full">
+          <defs>
+            <linearGradient
+              id="ionEngineGrad"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" stopColor="#F0F9FF" />
+              <stop offset="50%" stopColor="#BAE6FD" />
+              <stop offset="100%" stopColor="#0EA5E9" />
+            </linearGradient>
+            <radialGradient id="ionFlameGrad" cx="50%" cy="100%" r="50%">
+              <stop offset="0%" stopColor="#DBEAFE" />
+              <stop offset="50%" stopColor="#93C5FD" />
+              <stop offset="100%" stopColor="#3B82F6" />
+            </radialGradient>
+            <filter
+              id="ionEngineShadow"
+              x="-20%"
+              y="-20%"
+              width="140%"
+              height="140%"
+            >
+              <feDropShadow
+                dx="0"
+                dy="2"
+                stdDeviation="3"
+                floodColor="#0EA5E9"
+                floodOpacity="0.3"
+              />
+            </filter>
+          </defs>
+          <ellipse
+            cx="50"
+            cy="25"
+            rx="8"
+            ry="5"
+            fill="url(#ionEngineGrad)"
+            filter="url(#ionEngineShadow)"
+          />
+          <ellipse
+            cx="50"
+            cy="35"
+            rx="10"
+            ry="6"
+            fill="url(#ionEngineGrad)"
+            filter="url(#ionEngineShadow)"
+          />
+          <ellipse
+            cx="50"
+            cy="45"
+            rx="12"
+            ry="8"
+            fill="url(#ionEngineGrad)"
+            filter="url(#ionEngineShadow)"
+          />
+          <ellipse
+            cx="50"
+            cy="60"
+            rx="14"
+            ry="10"
+            fill="url(#ionEngineGrad)"
+            filter="url(#ionEngineShadow)"
+          />
+          <ellipse
+            cx="50"
+            cy="80"
+            rx="12"
+            ry="8"
+            fill="url(#ionFlameGrad)"
+            opacity="0.8"
+          />
+          <ellipse
+            cx="50"
+            cy="85"
+            rx="10"
+            ry="6"
+            fill="#93C5FD"
+            opacity="0.6"
+          />
+          <ellipse cx="50" cy="90" rx="8" ry="5" fill="#3B82F6" opacity="0.4" />
+          <circle cx="50" cy="15" r="2" fill="#FCD34D" />
+          <rect x="45" y="15" width="10" height="1" fill="#0369A1" rx="0.5" />
+        </svg>
+      );
+
     default:
       return getDefaultEngineIcon();
   }
@@ -1359,6 +1548,167 @@ const getFuelIcon = (partId: string) => {
           <rect x="40" y="78" width="20" height="5" fill="#0369A1" rx="2.5" />
           <circle cx="50" cy="5" r="2" fill="#FCD34D" />
           <rect x="45" y="5" width="10" height="1" fill="#0EA5E9" rx="0.5" />
+        </svg>
+      );
+
+    case "advanced-fuel-tank":
+      return (
+        <svg viewBox="0 0 100 100" className="w-full h-full">
+          <defs>
+            <linearGradient
+              id="advancedTankGrad"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" stopColor="#F0FDF4" />
+              <stop offset="50%" stopColor="#BBF7D0" />
+              <stop offset="100%" stopColor="#22C55E" />
+            </linearGradient>
+            <linearGradient
+              id="advancedFuelGrad"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" stopColor="#86EFAC" />
+              <stop offset="100%" stopColor="#22C55E" />
+            </linearGradient>
+            <filter
+              id="advancedTankShadow"
+              x="-20%"
+              y="-20%"
+              width="140%"
+              height="140%"
+            >
+              <feDropShadow
+                dx="0"
+                dy="3"
+                stdDeviation="4"
+                floodColor="#22C55E"
+                floodOpacity="0.4"
+              />
+            </filter>
+          </defs>
+          <ellipse
+            cx="50"
+            cy="15"
+            rx="18"
+            ry="12"
+            fill="url(#advancedTankGrad)"
+            filter="url(#advancedTankShadow)"
+          />
+          <rect
+            x="32"
+            y="15"
+            width="36"
+            height="55"
+            fill="url(#advancedTankGrad)"
+            filter="url(#advancedTankShadow)"
+          />
+          <ellipse
+            cx="50"
+            cy="70"
+            rx="18"
+            ry="12"
+            fill="url(#advancedTankGrad)"
+            filter="url(#advancedTankShadow)"
+          />
+          <rect
+            x="35"
+            y="25"
+            width="30"
+            height="40"
+            fill="url(#advancedFuelGrad)"
+            opacity="0.6"
+          />
+          <rect x="40" y="10" width="20" height="4" fill="#16A34A" rx="2" />
+          <rect x="40" y="72" width="20" height="4" fill="#16A34A" rx="2" />
+          <rect x="30" y="30" width="2" height="25" fill="#15803D" rx="1" />
+          <rect x="68" y="30" width="2" height="25" fill="#15803D" rx="1" />
+          <circle cx="50" cy="5" r="2" fill="#FCD34D" />
+        </svg>
+      );
+
+    case "lightweight-tank":
+      return (
+        <svg viewBox="0 0 100 100" className="w-full h-full">
+          <defs>
+            <linearGradient
+              id="lightweightTankGrad"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" stopColor="#FEF3C7" />
+              <stop offset="50%" stopColor="#FDE68A" />
+              <stop offset="100%" stopColor="#F59E0B" />
+            </linearGradient>
+            <linearGradient
+              id="lightweightFuelGrad"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" stopColor="#FED7AA" />
+              <stop offset="100%" stopColor="#F59E0B" />
+            </linearGradient>
+            <filter
+              id="lightweightTankShadow"
+              x="-20%"
+              y="-20%"
+              width="140%"
+              height="140%"
+            >
+              <feDropShadow
+                dx="0"
+                dy="2"
+                stdDeviation="3"
+                floodColor="#F59E0B"
+                floodOpacity="0.3"
+              />
+            </filter>
+          </defs>
+          <ellipse
+            cx="50"
+            cy="20"
+            rx="15"
+            ry="10"
+            fill="url(#lightweightTankGrad)"
+            filter="url(#lightweightTankShadow)"
+          />
+          <rect
+            x="35"
+            y="20"
+            width="30"
+            height="45"
+            fill="url(#lightweightTankGrad)"
+            filter="url(#lightweightTankShadow)"
+          />
+          <ellipse
+            cx="50"
+            cy="65"
+            rx="15"
+            ry="10"
+            fill="url(#lightweightTankGrad)"
+            filter="url(#lightweightTankShadow)"
+          />
+          <rect
+            x="38"
+            y="30"
+            width="24"
+            height="30"
+            fill="url(#lightweightFuelGrad)"
+            opacity="0.6"
+          />
+          <rect x="40" y="15" width="20" height="3" fill="#D97706" rx="1.5" />
+          <rect x="40" y="67" width="20" height="3" fill="#D97706" rx="1.5" />
+          <rect x="30" y="35" width="2" height="20" fill="#B45309" rx="1" />
+          <rect x="68" y="35" width="2" height="20" fill="#B45309" rx="1" />
         </svg>
       );
 
