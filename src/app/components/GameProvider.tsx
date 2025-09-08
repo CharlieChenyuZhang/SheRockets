@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { createContext, useContext, useReducer, ReactNode } from "react";
+import { useRouter } from "next/navigation";
 
 export interface RocketPart {
   id: string;
   name: string;
-  type: 'body' | 'engine' | 'wings' | 'fuel' | 'extras';
+  type: "body" | "engine" | "wings" | "fuel" | "extras";
   weight: number;
   thrust?: number;
   fuelCapacity?: number;
@@ -34,22 +34,22 @@ export interface GameState {
     parentalControls: boolean;
     language: string;
   };
-  lastSavedState: any;
+  lastSavedState: unknown;
 }
 
 type GameAction =
-  | { type: 'UPDATE_PROGRESS'; payload: Partial<GameState['playerProgress']> }
-  | { type: 'UPDATE_ROCKET'; payload: Partial<GameState['currentRocket']> }
-  | { type: 'UPDATE_SETTINGS'; payload: Partial<GameState['settings']> }
-  | { type: 'SAVE_GAME' }
-  | { type: 'LOAD_GAME'; payload: GameState };
+  | { type: "UPDATE_PROGRESS"; payload: Partial<GameState["playerProgress"]> }
+  | { type: "UPDATE_ROCKET"; payload: Partial<GameState["currentRocket"]> }
+  | { type: "UPDATE_SETTINGS"; payload: Partial<GameState["settings"]> }
+  | { type: "SAVE_GAME" }
+  | { type: "LOAD_GAME"; payload: GameState };
 
 const initialState: GameState = {
   playerProgress: {
     starsCollected: 0,
     attemptsMade: 0,
     currentLevel: 1,
-    unlockedParts: ['basic-body', 'basic-engine', 'basic-wings', 'basic-fuel'],
+    unlockedParts: ["basic-body", "basic-engine", "basic-wings", "basic-fuel"],
   },
   currentRocket: {
     parts: [],
@@ -61,22 +61,28 @@ const initialState: GameState = {
   settings: {
     soundEnabled: true,
     parentalControls: false,
-    language: 'en',
+    language: "en",
   },
   lastSavedState: null,
 };
 
 function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
-    case 'UPDATE_PROGRESS':
-      return { ...state, playerProgress: { ...state.playerProgress, ...action.payload } };
-    case 'UPDATE_ROCKET':
-      return { ...state, currentRocket: { ...state.currentRocket, ...action.payload } };
-    case 'UPDATE_SETTINGS':
+    case "UPDATE_PROGRESS":
+      return {
+        ...state,
+        playerProgress: { ...state.playerProgress, ...action.payload },
+      };
+    case "UPDATE_ROCKET":
+      return {
+        ...state,
+        currentRocket: { ...state.currentRocket, ...action.payload },
+      };
+    case "UPDATE_SETTINGS":
       return { ...state, settings: { ...state.settings, ...action.payload } };
-    case 'SAVE_GAME':
+    case "SAVE_GAME":
       return { ...state, lastSavedState: { ...state } };
-    case 'LOAD_GAME':
+    case "LOAD_GAME":
       return action.payload;
     default:
       return state;
@@ -107,7 +113,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 export function useGame() {
   const context = useContext(GameContext);
   if (!context) {
-    throw new Error('useGame must be used within a GameProvider');
+    throw new Error("useGame must be used within a GameProvider");
   }
   return context;
 }

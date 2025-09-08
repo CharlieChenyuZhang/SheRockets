@@ -3,13 +3,8 @@
 import { useGame, RocketPart } from "./GameProvider";
 import { useState } from "react";
 import Image from "next/image";
+import RocketPartIcon from "./RocketPartIcons";
 
-// TODO: Replace these placeholder image URLs with actual rocket part images
-// You can find better images at:
-// - NASA's image gallery: https://images.nasa.gov/
-// - SpaceX photos: https://www.spacex.com/media/
-// - Unsplash rocket images: https://unsplash.com/s/photos/rocket
-// - Pexels space images: https://www.pexels.com/search/rocket/
 const availableParts: RocketPart[] = [
   {
     id: "aluminum-body",
@@ -17,7 +12,7 @@ const availableParts: RocketPart[] = [
     type: "body",
     weight: 100,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "carbon-fiber-body",
@@ -25,7 +20,7 @@ const availableParts: RocketPart[] = [
     type: "body",
     weight: 80,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "titanium-body",
@@ -33,7 +28,7 @@ const availableParts: RocketPart[] = [
     type: "body",
     weight: 60,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "liquid-fuel-engine",
@@ -42,7 +37,7 @@ const availableParts: RocketPart[] = [
     weight: 50,
     thrust: 100,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "solid-fuel-engine",
@@ -51,7 +46,7 @@ const availableParts: RocketPart[] = [
     weight: 70,
     thrust: 150,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "super-heavy-engine",
@@ -60,7 +55,7 @@ const availableParts: RocketPart[] = [
     weight: 200,
     thrust: 5000,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "lunar-engine",
@@ -69,7 +64,7 @@ const availableParts: RocketPart[] = [
     weight: 120,
     thrust: 3000,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "moon-rocket-engine",
@@ -78,7 +73,7 @@ const availableParts: RocketPart[] = [
     weight: 300,
     thrust: 8000,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "fins",
@@ -87,7 +82,7 @@ const availableParts: RocketPart[] = [
     weight: 20,
     drag: 10,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "wings",
@@ -96,7 +91,7 @@ const availableParts: RocketPart[] = [
     weight: 15,
     drag: 5,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "liquid-fuel-tank",
@@ -105,7 +100,7 @@ const availableParts: RocketPart[] = [
     weight: 30,
     fuelCapacity: 1000,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "solid-fuel-tank",
@@ -113,8 +108,8 @@ const availableParts: RocketPart[] = [
     type: "fuel",
     weight: 40,
     fuelCapacity: 150,
-    unlocked: false,
-    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+    unlocked: true,
+    icon: "",
   },
   {
     id: "large-fuel-tank",
@@ -123,7 +118,7 @@ const availableParts: RocketPart[] = [
     weight: 80,
     fuelCapacity: 3000,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "mega-fuel-tank",
@@ -132,7 +127,7 @@ const availableParts: RocketPart[] = [
     weight: 150,
     fuelCapacity: 10000,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "moon-fuel-tank",
@@ -141,7 +136,7 @@ const availableParts: RocketPart[] = [
     weight: 200,
     fuelCapacity: 15000,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "parachute",
@@ -149,7 +144,7 @@ const availableParts: RocketPart[] = [
     type: "extras",
     weight: 10,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
   {
     id: "antenna",
@@ -157,7 +152,7 @@ const availableParts: RocketPart[] = [
     type: "extras",
     weight: 5,
     unlocked: true,
-    icon: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=200&h=200&fit=crop&crop=center",
+    icon: "",
   },
 ];
 
@@ -353,28 +348,10 @@ export default function RocketBuilder() {
             >
               <div className="text-center">
                 <div className="w-16 h-16 mx-auto mb-2 rounded-lg overflow-hidden bg-gray-800 flex items-center justify-center">
-                  <Image
-                    src={part.icon}
-                    alt={part.name}
-                    width={64}
-                    height={64}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      // Fallback to rocket PNG if image fails to load
-                      e.currentTarget.style.display = "none";
-                      const nextElement = e.currentTarget
-                        .nextElementSibling as HTMLElement;
-                      if (nextElement) {
-                        nextElement.style.display = "block";
-                      }
-                    }}
-                  />
-                  <Image
-                    src="/rocket.png"
-                    alt="Rocket"
-                    width={24}
-                    height={24}
-                    className="hidden"
+                  <RocketPartIcon
+                    partType={part.type}
+                    partId={part.id}
+                    className="w-full h-full"
                   />
                 </div>
                 <div className="text-white text-sm font-medium">
@@ -504,19 +481,6 @@ export default function RocketBuilder() {
           >
             {state.currentRocket.parts.length === 0 ? (
               <div className="text-center text-white/60 relative">
-                {/* Assembly Station Gantry */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-2 h-64 bg-gray-600/40 rounded-full" />
-                  <div
-                    className="absolute top-0 w-32 h-2 bg-gray-600/40 rounded-full"
-                    style={{ transform: "translateY(-1rem)" }}
-                  />
-                  <div
-                    className="absolute top-0 w-2 h-16 bg-gray-600/40 rounded-full"
-                    style={{ transform: "translateY(-2rem)" }}
-                  />
-                </div>
-
                 <div className="relative z-10">
                   <div className="mb-6 opacity-30 flex justify-center">
                     <Image
@@ -553,65 +517,15 @@ export default function RocketBuilder() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full relative">
-                {/* Assembly Station Gantry - Active */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-3 h-80 bg-gradient-to-b from-gray-600/60 to-gray-700/40 rounded-full shadow-lg" />
-                  <div
-                    className="absolute top-0 w-40 h-3 bg-gradient-to-r from-gray-600/60 to-gray-700/40 rounded-full shadow-lg"
-                    style={{ transform: "translateY(-1.5rem)" }}
-                  />
-                  <div
-                    className="absolute top-0 w-3 h-20 bg-gradient-to-b from-gray-600/60 to-gray-700/40 rounded-full shadow-lg"
-                    style={{ transform: "translateY(-2.5rem)" }}
-                  />
-
-                  {/* Assembly Clamps */}
-                  {state.currentRocket.parts.map((_, index) => {
-                    const totalHeight =
-                      (state.currentRocket.parts.length - 1) * 80;
-                    const containerCenter = 50;
-                    const clampY =
-                      containerCenter - totalHeight / 2 + index * 80;
-                    return (
-                      <div
-                        key={`clamp-${index}`}
-                        className="absolute w-8 h-4 bg-gray-700/60 rounded-full border border-pink-500/40"
-                        style={{
-                          left: "50%",
-                          top: `${clampY}%`,
-                          transform: "translate(-50%, -50%)",
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-
                 {/* Drag Overlay */}
                 {draggedPart && (
                   <div className="absolute inset-0 bg-pink-500/10 border-2 border-dashed border-pink-500/50 rounded-2xl flex items-center justify-center z-20 backdrop-blur-sm">
                     <div className="text-center text-white">
                       <div className="w-20 h-20 mx-auto mb-3 rounded-xl overflow-hidden bg-gray-800/80 flex items-center justify-center border border-pink-500/50">
-                        <Image
-                          src={draggedPart.icon}
-                          alt={draggedPart.name}
-                          width={80}
-                          height={80}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                            const nextElement = e.currentTarget
-                              .nextElementSibling as HTMLElement;
-                            if (nextElement) {
-                              nextElement.style.display = "block";
-                            }
-                          }}
-                        />
-                        <Image
-                          src="/rocket.png"
-                          alt="Rocket"
-                          width={48}
-                          height={48}
-                          className="hidden"
+                        <RocketPartIcon
+                          partType={draggedPart.type}
+                          partId={draggedPart.id}
+                          className="w-full h-full"
                         />
                       </div>
                       <div className="text-xl font-bold mb-2">
@@ -642,27 +556,10 @@ export default function RocketBuilder() {
                         }}
                       >
                         <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-800/80 flex items-center justify-center border border-pink-500/50">
-                          <Image
-                            src={part.icon}
-                            alt={part.name}
-                            width={56}
-                            height={56}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.currentTarget.style.display = "none";
-                              const nextElement = e.currentTarget
-                                .nextElementSibling as HTMLElement;
-                              if (nextElement) {
-                                nextElement.style.display = "block";
-                              }
-                            }}
-                          />
-                          <Image
-                            src="/rocket.png"
-                            alt="Rocket"
-                            width={32}
-                            height={32}
-                            className="hidden"
+                          <RocketPartIcon
+                            partType={part.type}
+                            partId={part.id}
+                            className="w-full h-full"
                           />
                         </div>
                         <div className="flex-1">
@@ -817,14 +714,33 @@ export default function RocketBuilder() {
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between items-center p-2 bg-gray-700/30 rounded-lg">
-                <span className="text-white/80">Max Altitude:</span>
+                <span className="text-white/80">Max Range:</span>
                 <span className="text-pink-300 font-mono">
-                  {Math.round(
-                    (state.currentRocket.thrust /
-                      Math.max(state.currentRocket.mass, 1)) *
-                      1000
-                  )}
-                  m
+                  {(() => {
+                    const thrustToWeight =
+                      state.currentRocket.thrust /
+                      ((state.currentRocket.mass + state.currentRocket.fuel) *
+                        9.81);
+                    const fuelMass = state.currentRocket.fuel;
+                    const specificImpulse = 300;
+                    const deltaV =
+                      specificImpulse *
+                      9.81 *
+                      Math.log(
+                        (state.currentRocket.mass + fuelMass) /
+                          state.currentRocket.mass
+                      );
+
+                    if (thrustToWeight >= 0.7 && deltaV >= 4000) {
+                      return "384,400 km (Moon)";
+                    } else if (thrustToWeight >= 0.7 && deltaV >= 2000) {
+                      return "Low Earth Orbit";
+                    } else if (thrustToWeight >= 0.7) {
+                      return "Suborbital";
+                    } else {
+                      return "Ground Level";
+                    }
+                  })()}
                 </span>
               </div>
               <div className="flex justify-between items-center p-2 bg-gray-700/30 rounded-lg">
@@ -863,7 +779,8 @@ export default function RocketBuilder() {
               {(() => {
                 const thrustToWeight =
                   state.currentRocket.thrust /
-                  (state.currentRocket.mass * 9.81);
+                  ((state.currentRocket.mass + state.currentRocket.fuel) *
+                    9.81);
                 const fuelMass = state.currentRocket.fuel; // Assuming 1L = 1kg
                 const specificImpulse = 300;
                 const deltaV =
@@ -873,23 +790,101 @@ export default function RocketBuilder() {
                     (state.currentRocket.mass + fuelMass) /
                       state.currentRocket.mass
                   );
-                const moonMissionDeltaV = 8000;
+                const moonMissionDeltaV = 4000; // Reduced for gameplay (real moon mission needs ~11,200 m/s)
                 const canReachMoon =
-                  deltaV >= moonMissionDeltaV && thrustToWeight >= 1.0;
+                  deltaV >= moonMissionDeltaV && thrustToWeight >= 0.7; // More forgiving T/W requirement
 
                 return (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
+                    {/* Math Formulas Section */}
+                    <div className="bg-gray-800/50 p-3 rounded-lg border border-gray-600">
+                      <h4 className="text-yellow-400 font-bold text-sm mb-2">
+                        🧮 Math Formulas (For Learning)
+                      </h4>
+                      <div className="text-xs space-y-1 text-gray-300">
+                        <div>
+                          <strong>T/W Ratio:</strong> Thrust ÷ (Mass × 9.81)
+                        </div>
+                        <div className="text-blue-300">
+                          = {state.currentRocket.thrust}N ÷ (
+                          {(
+                            state.currentRocket.mass + state.currentRocket.fuel
+                          ).toFixed(0)}
+                          kg × 9.81)
+                        </div>
+                        <div className="text-blue-300">
+                          = {state.currentRocket.thrust}N ÷{" "}
+                          {(
+                            (state.currentRocket.mass +
+                              state.currentRocket.fuel) *
+                            9.81
+                          ).toFixed(0)}
+                          N
+                        </div>
+                        <div className="text-green-300">
+                          = {thrustToWeight.toFixed(3)}
+                        </div>
+                      </div>
+                      <div className="text-xs space-y-1 text-gray-300 mt-2">
+                        <div>
+                          <strong>Delta-V:</strong> Isp × 9.81 × ln(Mass₀/Mass₁)
+                        </div>
+                        <div className="text-blue-300">
+                          = 300s × 9.81 × ln(
+                          {(
+                            state.currentRocket.mass + state.currentRocket.fuel
+                          ).toFixed(0)}
+                          kg ÷ {state.currentRocket.mass}kg)
+                        </div>
+                        <div className="text-blue-300">
+                          = 2943 × ln(
+                          {(
+                            (state.currentRocket.mass +
+                              state.currentRocket.fuel) /
+                            state.currentRocket.mass
+                          ).toFixed(2)}
+                          )
+                        </div>
+                        <div className="text-green-300">
+                          = {deltaV.toFixed(0)} m/s
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mission Requirements */}
+                    <div className="bg-gray-800/50 p-3 rounded-lg border border-gray-600">
+                      <h4 className="text-purple-400 font-bold text-sm mb-2">
+                        🎯 Mission Requirements
+                      </h4>
+                      <div className="text-xs space-y-1 text-gray-300">
+                        <div>
+                          <strong>Moon Mission:</strong> T/W ≥ 0.7 AND ΔV ≥
+                          4,000 m/s
+                        </div>
+                        <div className="text-orange-300">
+                          (Real moon mission needs T/W ≥ 1.0 AND ΔV ≥ 11,200
+                          m/s)
+                        </div>
+                        <div>
+                          <strong>LEO:</strong> T/W ≥ 0.7 AND ΔV ≥ 2,000 m/s
+                        </div>
+                        <div>
+                          <strong>Suborbital:</strong> T/W ≥ 0.7
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="flex justify-between items-center">
                       <span className="text-white/80">T/W Ratio:</span>
                       <span
                         className={`font-mono ${
-                          thrustToWeight >= 1.0
+                          thrustToWeight >= 0.7
                             ? "text-green-400"
                             : "text-red-400"
                         }`}
                       >
                         {thrustToWeight.toFixed(2)}{" "}
-                        {thrustToWeight >= 1.0 ? "✅" : "❌"}
+                        {thrustToWeight >= 0.7 ? "✅" : "❌"}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
@@ -920,7 +915,7 @@ export default function RocketBuilder() {
                       <div className="text-xs text-gray-400 mt-1 text-center">
                         {canReachMoon
                           ? "Your rocket can reach the moon!"
-                          : "Need T/W ≥ 1.0 and ΔV ≥ 8,000 m/s"}
+                          : "Need T/W ≥ 0.7 and ΔV ≥ 4,000 m/s"}
                       </div>
                     </div>
                   </div>

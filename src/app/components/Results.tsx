@@ -5,7 +5,7 @@ import { useState } from "react";
 
 export default function Results() {
   const { state, dispatch, navigateTo } = useGame();
-  const [aiMessage, setAiMessage] = useState("");
+  const [aiMessage] = useState("");
 
   // Calculate mission results
   const maxAltitude = Math.round(
@@ -164,7 +164,7 @@ export default function Results() {
             </div>
             <div className="flex-1">
               <h3 className="text-white font-bold text-lg mb-3">
-                Luna's Feedback
+                Luna&apos;s Feedback
               </h3>
               <div className="text-white/90 text-base leading-relaxed mb-4">
                 {aiMessage || generateAIFeedback()}

@@ -2,6 +2,7 @@
 
 import { useGame } from "./GameProvider";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 const rewards = [
   {
@@ -81,7 +82,7 @@ export default function Victory() {
   useEffect(() => {
     if (showReward) {
       setAiMessage(
-        `Amazing! You've unlocked the ${currentReward.name}! This advanced component will help you reach even greater heights in your next mission! 🚀`
+        `Amazing! You&apos;ve unlocked the ${currentReward.name}! This advanced component will help you reach even greater heights in your next mission! 🚀`
       );
     }
   }, [showReward, currentReward.name]);
@@ -163,7 +164,7 @@ export default function Victory() {
             Mission Complete!
           </h1>
           <p className="text-2xl text-pink-300 font-light mb-2">
-            You've successfully reached your destination!
+            You&apos;ve successfully reached your destination!
           </p>
           <p className="text-lg text-gray-300 font-light">
             Your courage and creativity made this possible! 🌟
@@ -175,14 +176,20 @@ export default function Victory() {
           <div className="bg-gray-900/60 backdrop-blur-sm rounded-3xl p-8 border-2 border-pink-500/50 shadow-2xl shadow-pink-500/25 mb-8 animate-pulse">
             <div className="text-center">
               <div className="w-24 h-24 mx-auto mb-4 rounded-lg overflow-hidden bg-gray-800 flex items-center justify-center">
-                <img
+                <Image
                   src={currentReward.icon}
                   alt={currentReward.name}
+                  width={96}
+                  height={96}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     // Fallback to emoji if image fails to load
                     e.currentTarget.style.display = "none";
-                    e.currentTarget.nextElementSibling.style.display = "block";
+                    const nextSibling = e.currentTarget
+                      .nextElementSibling as HTMLElement;
+                    if (nextSibling) {
+                      nextSibling.style.display = "block";
+                    }
                   }}
                 />
                 <div className="text-4xl hidden">🚀</div>
@@ -258,7 +265,7 @@ export default function Victory() {
         {/* Encouragement */}
         <div className="text-center mt-8">
           <p className="text-white/60 text-lg">
-            You're becoming an amazing space explorer! 🌟
+            You&apos;re becoming an amazing space explorer! 🌟
           </p>
           <p className="text-white/40 text-sm mt-2">
             Your curiosity and courage will take you to amazing places!

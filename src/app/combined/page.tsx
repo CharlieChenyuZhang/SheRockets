@@ -1,5 +1,5 @@
-import CombinedBuilder from "../components/CombinedBuilder";
+import RocketBuilder from "../components/RocketBuilder";
 
 export default function CombinedPage() {
-  return <CombinedBuilder />;
+  return <RocketBuilder />;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 interface Message {
   id: string;
@@ -33,7 +33,6 @@ export default function AITutor({ className = "" }: AITutorProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [mouseDownTime, setMouseDownTime] = useState(0);
   const [hasMoved, setHasMoved] = useState(false);
-  const chatRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -91,24 +90,27 @@ export default function AITutor({ className = "" }: AITutorProps) {
     e.preventDefault(); // Prevent default behavior
   };
 
-  const handleDragMove = (e: MouseEvent) => {
-    if (isDragging) {
-      setHasMoved(true);
-      const newX = e.clientX - dragOffset.x;
-      const newY = e.clientY - dragOffset.y;
+  const handleDragMove = useCallback(
+    (e: MouseEvent) => {
+      if (isDragging) {
+        setHasMoved(true);
+        const newX = e.clientX - dragOffset.x;
+        const newY = e.clientY - dragOffset.y;
 
-      // Keep within viewport bounds
-      const maxX = window.innerWidth - 350; // Chat width
-      const maxY = window.innerHeight - (isOpen ? 500 : 80); // Chat height when open/closed
+        // Keep within viewport bounds
+        const maxX = window.innerWidth - 350; // Chat width
+        const maxY = window.innerHeight - (isOpen ? 500 : 80); // Chat height when open/closed
 
-      setPosition({
-        x: Math.max(0, Math.min(newX, maxX)),
-        y: Math.max(0, Math.min(newY, maxY)),
-      });
-    }
-  };
+        setPosition({
+          x: Math.max(0, Math.min(newX, maxX)),
+          y: Math.max(0, Math.min(newY, maxY)),
+        });
+      }
+    },
+    [isDragging, dragOffset, isOpen]
+  );
 
-  const handleDragEnd = () => {
+  const handleDragEnd = useCallback(() => {
     const dragDuration = Date.now() - mouseDownTime;
     const wasClick = !hasMoved && dragDuration < 200; // Less than 200ms and no movement = click
 
@@ -118,7 +120,7 @@ export default function AITutor({ className = "" }: AITutorProps) {
     if (wasClick && !isOpen) {
       setIsOpen(true);
     }
-  };
+  }, [mouseDownTime, hasMoved, isOpen]);
 
   useEffect(() => {
     if (isDragging) {
@@ -129,7 +131,7 @@ export default function AITutor({ className = "" }: AITutorProps) {
         document.removeEventListener("mouseup", handleDragEnd);
       };
     }
-  }, [isDragging, dragOffset]);
+  }, [isDragging, handleDragMove, handleDragEnd]);
 
   const handleSendMessage = () => {
     if (!inputText.trim()) return;

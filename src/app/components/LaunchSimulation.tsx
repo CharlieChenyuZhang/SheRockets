@@ -154,7 +154,7 @@ export default function LaunchSimulation() {
   const specificImpulse = 300; // seconds (typical for liquid fuel)
   const fuelFlowRate =
     thrust > 0
-      ? (thrust / (specificImpulse * 9.81)) * 2 // kg/s - 2x faster for quick simulation
+      ? (thrust / (specificImpulse * 9.81)) * 0.3 // kg/s - 0.3x for more forgiving gameplay
       : 0.1; // Fallback fuel flow rate when no engines (for testing)
 
   // Debug initial values
@@ -251,9 +251,11 @@ export default function LaunchSimulation() {
             // Normal physics calculations
             if (prev.missionPhase === "launch") {
               if (hasFuel && prev.altitude < 100000) {
-                // Apply thrust - simplified calculations
-                newVelocity += 200 * dt; // Accelerate upward
-                newHorizontalVelocity += 50 * dt; // Build horizontal velocity
+                // Apply thrust - use actual rocket physics
+                const currentMass = rocketMass + prev.fuel; // Fuel is in liters, assume 1L = 1kg
+                const acceleration = thrust / currentMass - 9.81; // Thrust minus gravity
+                newVelocity += acceleration * dt; // Realistic acceleration
+                newHorizontalVelocity += (thrust / currentMass) * 0.1 * dt; // Build horizontal velocity
                 newAltitude = Math.max(0, prev.altitude + newVelocity * dt);
               } else if (prev.altitude > 0) {
                 // No fuel but rocket is in the air - ballistic trajectory
@@ -275,20 +277,20 @@ export default function LaunchSimulation() {
               }
 
               // Check for failure conditions during launch (but allow lift-off animation first)
-              if (newTime > 5.0) {
-                // Wait 5 seconds before checking for failures (skip in demo mode)
+              if (newTime > 15.0) {
+                // Wait 15 seconds before checking for failures (more forgiving for gameplay)
                 if (prev.altitude <= 0 && prev.velocity < 0) {
                   // Crashed on ground
                   isComplete = true;
                   success = false;
                   newMissionPhase = "failed";
-                } else if (prev.velocity < -50 && prev.altitude < 10000) {
-                  // Falling too fast at low altitude (stall/spin)
+                } else if (prev.velocity < -150 && prev.altitude < 3000) {
+                  // Falling too fast at low altitude (stall/spin) - more forgiving
                   isComplete = true;
                   success = false;
                   newMissionPhase = "failed";
-                } else if (prev.fuel <= 0 && prev.altitude < 50000) {
-                  // Out of fuel too early in launch
+                } else if (prev.fuel <= 0 && prev.altitude < 5000) {
+                  // Out of fuel too early in launch - more forgiving
                   isComplete = true;
                   success = false;
                   newMissionPhase = "failed";
@@ -322,16 +324,23 @@ export default function LaunchSimulation() {
 
             // Phase 3: Transfer (coast to moon)
             else if (prev.missionPhase === "transfer") {
-              // Simplified transfer - reduce distance to moon
-              const transferSpeed = 1000; // m/s
-              newDistanceToMoon = Math.max(
-                0,
-                prev.distanceToMoon - transferSpeed * dt
-              );
+              // Realistic transfer - calculate distance based on actual position
               newAltitude += 200 * dt; // Continue climbing
 
-              // Check if reached moon
-              if (newDistanceToMoon <= LUNAR_ORBIT_ALTITUDE) {
+              // Calculate realistic distance to moon based on progress
+              const transferProgress = Math.min((newTime - 25) / 20, 1); // 20 seconds for transfer
+              const currentDistance = MOON_DISTANCE * (1 - transferProgress);
+
+              // Add some orbital mechanics - distance doesn't decrease linearly
+              const orbitalFactor =
+                Math.sin(transferProgress * Math.PI * 2) * 0.1; // Small oscillation
+              newDistanceToMoon = Math.max(
+                LUNAR_ORBIT_ALTITUDE,
+                currentDistance + orbitalFactor * MOON_DISTANCE
+              );
+
+              // Check if reached moon (more realistic threshold)
+              if (newDistanceToMoon <= LUNAR_ORBIT_ALTITUDE * 2) {
                 newMissionPhase = "lunar_approach";
               }
 
@@ -345,7 +354,15 @@ export default function LaunchSimulation() {
 
             // Phase 4: Lunar approach
             else if (prev.missionPhase === "lunar_approach") {
-              // Simplified lunar approach
+              // Realistic lunar approach with gradual distance reduction
+              const approachProgress = Math.min((newTime - 45) / 10, 1); // 10 seconds for approach
+
+              // Gradually reduce distance to moon during approach
+              newDistanceToMoon = Math.max(
+                LUNAR_ORBIT_ALTITUDE * 0.1, // Don't go below 10% of lunar orbit
+                LUNAR_ORBIT_ALTITUDE * (1 - approachProgress * 0.9)
+              );
+
               if (hasFuel) {
                 newHorizontalVelocity -= 50 * dt; // Slow down for approach
                 newAltitude += 50 * dt; // Fine altitude adjustment
@@ -358,7 +375,15 @@ export default function LaunchSimulation() {
 
             // Phase 5: Landing
             else if (prev.missionPhase === "landing") {
-              // Final landing phase
+              // Final landing phase with realistic distance to surface
+              const landingProgress = Math.min((newTime - 55) / 5, 1); // 5 seconds for landing
+
+              // Final approach - distance goes to surface level
+              newDistanceToMoon = Math.max(
+                0, // Can reach 0 (surface)
+                LUNAR_ORBIT_ALTITUDE * 0.1 * (1 - landingProgress)
+              );
+
               if (hasFuel && newVelocity > -5) {
                 newVelocity -= 10 * dt; // Gentle descent
               } else {
@@ -419,6 +444,12 @@ export default function LaunchSimulation() {
               newRocketX = prev.rocketX + (targetX - prev.rocketX) * smoothness;
               newRocketY = prev.rocketY + (targetY - prev.rocketY) * smoothness;
             }
+
+            // Demo mode distance calculation - realistic progression
+            const distanceProgress = Math.min(newTime / 15, 1);
+            // Use a more realistic distance curve (not linear)
+            const distanceCurve = 1 - Math.pow(distanceProgress, 1.5); // Slower initial, faster at end
+            newDistanceToMoon = Math.max(0, MOON_DISTANCE * distanceCurve);
           } else {
             // Normal mode: Complex phase-based positioning
             // During initial launch phase, ignore progress calculation and stay near Earth
@@ -805,11 +836,43 @@ export default function LaunchSimulation() {
                     {/* Mission Time */}
                     <div className="text-center">
                       <div className="text-gray-300 text-xs font-medium mb-1">
-                        TIME
+                        MISSION TIME
                       </div>
                       <div className="text-white text-lg font-mono">
-                        {simState.time.toFixed(1)}s
+                        {(() => {
+                          // Simulated realistic mission time
+                          const realTime = simState.time; // Actual simulation time (0-15s)
+                          const totalSimTime = 15; // Total simulation duration
+
+                          // Realistic mission timeline: ~3.5 days total
+                          const totalMissionTime =
+                            8 * 60 +
+                            2 * 60 * 60 +
+                            3 * 24 * 60 * 60 +
+                            12 * 60 * 60 +
+                            30 * 60; // ~3.5 days
+                          const progress = realTime / totalSimTime;
+                          const simulatedTime = progress * totalMissionTime;
+
+                          // Format based on duration
+                          if (simulatedTime < 60) {
+                            return `${Math.floor(simulatedTime)}s`;
+                          } else if (simulatedTime < 3600) {
+                            return `${Math.floor(
+                              simulatedTime / 60
+                            )}m ${Math.floor(simulatedTime % 60)}s`;
+                          } else if (simulatedTime < 86400) {
+                            return `${Math.floor(
+                              simulatedTime / 3600
+                            )}h ${Math.floor((simulatedTime % 3600) / 60)}m`;
+                          } else {
+                            return `${Math.floor(
+                              simulatedTime / 86400
+                            )}d ${Math.floor((simulatedTime % 86400) / 3600)}h`;
+                          }
+                        })()}
                       </div>
+                      <div className="text-gray-400 text-xs">(simulated)</div>
                     </div>
 
                     {/* Divider */}
@@ -842,10 +905,56 @@ export default function LaunchSimulation() {
                         ALTITUDE
                       </div>
                       <div className="text-white text-lg font-mono">
-                        {simState.altitude > 1000
-                          ? `${(simState.altitude / 1000).toFixed(1)}km`
-                          : `${Math.round(simState.altitude)}m`}
+                        {(() => {
+                          if (isDemoMode) {
+                            // Demo mode: Show realistic altitude progression
+                            const progress = simState.time / 15; // 0 to 1 over 15 seconds
+
+                            if (progress < 0.1) {
+                              // Launch phase: 0 to 44km (Apollo launch to staging)
+                              const launchProgress = progress / 0.1;
+                              const altitude = launchProgress * 44000; // 0 to 44km (Apollo staging altitude)
+                              return altitude > 1000
+                                ? `${(altitude / 1000).toFixed(1)}km`
+                                : `${Math.round(altitude)}m`;
+                            } else if (progress < 0.2) {
+                              // Earth parking orbit: 44km to 170km (Apollo parking orbit)
+                              const orbitProgress = (progress - 0.1) / 0.1;
+                              const altitude = 44000 + orbitProgress * 126000; // 44km to 170km
+                              return `${(altitude / 1000).toFixed(1)}km`;
+                            } else if (progress < 0.7) {
+                              // Translunar injection: 170km to 185km (lunar orbit insertion)
+                              const transferProgress = (progress - 0.2) / 0.5;
+                              const altitude =
+                                170000 + transferProgress * 15000; // 170km to 185km
+                              return `${(altitude / 1000).toFixed(1)}km`;
+                            } else if (progress < 0.9) {
+                              // Lunar approach: 185km to 2.6km (Apollo descent)
+                              const approachProgress = (progress - 0.7) / 0.2;
+                              const altitude =
+                                185000 - approachProgress * 182400; // 185km to 2.6km
+                              return altitude > 1000
+                                ? `${(altitude / 1000).toFixed(1)}km`
+                                : `${Math.round(altitude)}m`;
+                            } else {
+                              // Final landing: 2.6km to 0m (Apollo touchdown)
+                              const landingProgress = (progress - 0.9) / 0.1;
+                              const altitude = 2600 - landingProgress * 2600; // 2.6km to 0m
+                              return altitude > 1000
+                                ? `${(altitude / 1000).toFixed(1)}km`
+                                : `${Math.round(altitude)}m`;
+                            }
+                          } else {
+                            // Normal mode: Use actual altitude
+                            return simState.altitude > 1000
+                              ? `${(simState.altitude / 1000).toFixed(1)}km`
+                              : `${Math.round(simState.altitude)}m`;
+                          }
+                        })()}
                       </div>
+                      {isDemoMode && (
+                        <div className="text-gray-400 text-xs">(simulated)</div>
+                      )}
                     </div>
 
                     {/* Divider */}
@@ -857,8 +966,44 @@ export default function LaunchSimulation() {
                         VELOCITY
                       </div>
                       <div className="text-white text-lg font-mono">
-                        {Math.round(simState.velocity)}m/s
+                        {(() => {
+                          if (isDemoMode) {
+                            // Demo mode: Show realistic velocity progression
+                            const progress = simState.time / 15; // 0 to 1 over 15 seconds
+
+                            if (progress < 0.1) {
+                              // Launch phase: 0 to 1,980 m/s (Apollo staging velocity)
+                              const launchProgress = progress / 0.1;
+                              return Math.round(launchProgress * 1980);
+                            } else if (progress < 0.2) {
+                              // Earth parking orbit: 1,980 to 7,809 m/s (Apollo orbital velocity)
+                              const orbitProgress = (progress - 0.1) / 0.1;
+                              return Math.round(1980 + orbitProgress * 5829);
+                            } else if (progress < 0.7) {
+                              // Translunar injection: 7,809 to 10,827 m/s (Apollo TLI velocity)
+                              const transferProgress = (progress - 0.2) / 0.5;
+                              return Math.round(7809 + transferProgress * 3018);
+                            } else if (progress < 0.9) {
+                              // Lunar approach: 10,827 to 1,500 m/s (lunar orbit insertion)
+                              const approachProgress = (progress - 0.7) / 0.2;
+                              return Math.round(
+                                10827 - approachProgress * 9327
+                              );
+                            } else {
+                              // Final landing: 1,500 to 0 m/s (Apollo descent and touchdown)
+                              const landingProgress = (progress - 0.9) / 0.1;
+                              return Math.round(1500 - landingProgress * 1500);
+                            }
+                          } else {
+                            // Normal mode: Use actual velocity
+                            return Math.round(simState.velocity);
+                          }
+                        })()}
+                        m/s
                       </div>
+                      {isDemoMode && (
+                        <div className="text-gray-400 text-xs">(simulated)</div>
+                      )}
                     </div>
 
                     {/* Divider */}
@@ -884,9 +1029,7 @@ export default function LaunchSimulation() {
                       </div>
                       <div className="text-blue-400 text-lg font-mono">
                         {simState.distanceToMoon > 1000000
-                          ? `${(simState.distanceToMoon / 1000000).toFixed(
-                              1
-                            )}M km`
+                          ? `${(simState.distanceToMoon / 1000).toFixed(0)} km`
                           : `${Math.round(simState.distanceToMoon / 1000)}k km`}
                       </div>
                     </div>
@@ -1167,7 +1310,7 @@ export default function LaunchSimulation() {
               simState.missionPhase !== "failed" &&
               simState.missionPhase !== "landing" &&
               !simState.success && (
-                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 z-0">
+                <div className="absolute -bottom-8 left-3/7 transform -translate-x-1/2 z-0">
                   {/* Main central flame */}
                   <div className="w-3 h-16 bg-gradient-to-t from-red-600 via-orange-500 to-yellow-300 rounded-b-full opacity-90 shadow-lg thrust-main">
                     <div className="absolute inset-0 bg-gradient-to-t from-red-700 to-transparent rounded-b-full opacity-70"></div>
