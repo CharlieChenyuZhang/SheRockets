@@ -207,16 +207,6 @@ To github.com:CharlieChenyuZhang/SheRockets.git
 ## xianglu's script
 
 ```
-python xianglu.py
-Running Granular Conjoint Analysis...
-Loading data...
-Loaded 125 respondents
-Converting to granular choice format...
-Running granular analysis...
-Using features (drop-one per attribute): ['male_tutor_diff', 'tech_colors_diff', 'school_pays_diff', 'pricing_4.99_diff', 'pricing_7.99_diff', 'pricing_9.99_diff', 'brilliance_message_diff', 'neutral_message_diff', 'space_rescue_story_diff', 'no_specific_role_diff']
-Warning: Using regular standard errors (robust covariance not available)
-Creating granular results table...
-
 ====================================================================================================
 GRANULAR CONJOINT ANALYSIS RESULTS
 ====================================================================================================
@@ -275,7 +265,7 @@ You solved it so quickly — you must have a real... -0.5n.s.            0.867  
 Significance codes: * p<.05, ** p<.01, *** p<.001
 pp = percentage points
 P-values are cluster-robust (by respondent)
-Results saved to: /Users/charlie/github.com/hai/SheRockets/data_analysis/granular_conjoint_results_20250912_023454.csv
+Results saved to: /Users/charlie/github.com/hai/SheRockets/data_analysis/granular_conjoint_results_20250912_025051.csv
 
 Conjoint analysis completed. Results saved to:            attribute  ... abs_effect
 3            Pricing  ...  54.680804
@@ -352,8 +342,9 @@ Level                                    Learning   Enjoyment  N
 No specific role: Just design a rocke... 3.8±0.1  3.8±0.1  439
 Hero astronaut: You are the astronaut... 3.9±0.1  3.9±0.1  561
 
-Rating results saved to: /Users/charlie/github.com/hai/SheRockets/data_analysis/granular_ratings_analysis_20250912_023455.csv
+Rating results saved to: /Users/charlie/github.com/hai/SheRockets/data_analysis/granular_ratings_analysis_20250912_025051.csv
 Analysis complete!
+
 ```
 
 # Conjoint Analysis for AI Tutor Study
