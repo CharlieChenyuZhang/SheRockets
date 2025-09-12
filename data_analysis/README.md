@@ -204,6 +204,158 @@ To github.com:CharlieChenyuZhang/SheRockets.git
    26e8f02..8b5e5d5  main -> main
 ```
 
+## xianglu's script
+
+```
+python xianglu.py
+Running Granular Conjoint Analysis...
+Loading data...
+Loaded 125 respondents
+Converting to granular choice format...
+Running granular analysis...
+Using features (drop-one per attribute): ['male_tutor_diff', 'tech_colors_diff', 'school_pays_diff', 'pricing_4.99_diff', 'pricing_7.99_diff', 'pricing_9.99_diff', 'brilliance_message_diff', 'neutral_message_diff', 'space_rescue_story_diff', 'no_specific_role_diff']
+Warning: Using regular standard errors (robust covariance not available)
+Creating granular results table...
+
+====================================================================================================
+GRANULAR CONJOINT ANALYSIS RESULTS
+====================================================================================================
+
+PRICING
+--------------------------------------------------------------------------------
+Level                                              Effect (pp)     P-value      Significance
+--------------------------------------------------------------------------------
+School pays (free for families)                    +54.7***             0.000        ***
+Free trial + $4.99/month                           +30.7***             0.000        ***
+Free trial + $7.99/month                           +21.5***             0.000        ***
+Free trial + $9.99/month                           +13.5*               0.021        *
+
+TUTOR
+--------------------------------------------------------------------------------
+Level                                              Effect (pp)     P-value      Significance
+--------------------------------------------------------------------------------
+Male AI tutor                                      -15.4***             0.000        ***
+
+ROLE_PLAY
+--------------------------------------------------------------------------------
+Level                                              Effect (pp)     P-value      Significance
+--------------------------------------------------------------------------------
+No specific role: Just design a rocket and see ... -13.2***             0.000        ***
+
+STORYTELLING
+--------------------------------------------------------------------------------
+Level                                              Effect (pp)     P-value      Significance
+--------------------------------------------------------------------------------
+Space rescue story: "Your spaceship must delive... +12.4***             0.000        ***
+
+ASC/POSITION
+--------------------------------------------------------------------------------
+Level                                              Effect (pp)     P-value      Significance
+--------------------------------------------------------------------------------
+(A position bias)                                  +3.9n.s.            0.184        n.s.
+
+COLOR_PALETTE
+--------------------------------------------------------------------------------
+Level                                              Effect (pp)     P-value      Significance
+--------------------------------------------------------------------------------
+Tech & bold (deep blue / black / neon)             -3.3n.s.            0.258        n.s.
+
+MESSAGE_FAILURE_
+--------------------------------------------------------------------------------
+Level                                              Effect (pp)     P-value      Significance
+--------------------------------------------------------------------------------
+This design didn't launch successfully. Here is... -2.8n.s.            0.345        n.s.
+
+MESSAGE_SUCCESS_
+--------------------------------------------------------------------------------
+Level                                              Effect (pp)     P-value      Significance
+--------------------------------------------------------------------------------
+You solved it so quickly — you must have a real... -0.5n.s.            0.867        n.s.
+
+Significance codes: * p<.05, ** p<.01, *** p<.001
+pp = percentage points
+P-values are cluster-robust (by respondent)
+Results saved to: /Users/charlie/github.com/hai/SheRockets/data_analysis/granular_conjoint_results_20250912_023454.csv
+
+Conjoint analysis completed. Results saved to:            attribute  ... abs_effect
+3            Pricing  ...  54.680804
+4            Pricing  ...  30.729299
+5            Pricing  ...  21.462475
+1              Tutor  ...  15.366355
+6            Pricing  ...  13.488004
+10         Role_play  ...  13.235670
+9       Storytelling  ...  12.411558
+0       ASC/position  ...   3.892108
+2      Color_palette  ...   3.312460
+8   Message_failure_  ...   2.772917
+7   Message_success_  ...   0.490601
+
+[11 rows x 8 columns]
+
+Running Rating Analysis...
+
+Analyzing rating data...
+
+================================================================================
+RATING ANALYSIS BY ATTRIBUTE
+================================================================================
+
+TUTOR
+------------------------------------------------------------
+Level                                    Learning   Enjoyment  N
+------------------------------------------------------------
+Male AI tutor                            3.8±0.1  3.8±0.1  425
+Female AI tutor                          3.9±0.1  3.9±0.1  575
+
+COLOR_PALETTE
+------------------------------------------------------------
+Level                                    Learning   Enjoyment  N
+------------------------------------------------------------
+Tech & bold (deep blue / black / neon)   3.8±0.1  3.8±0.1  497
+Friendly & warm (coral / lavender / p... 3.9±0.1  3.9±0.1  503
+
+PRICING
+------------------------------------------------------------
+Level                                    Learning   Enjoyment  N
+------------------------------------------------------------
+School pays (free for families)          3.8±0.1  3.8±0.1  270
+Free trial + $9.99/month                 3.9±0.1  4.0±0.2  165
+Free trial + $4.99/month                 3.8±0.1  3.8±0.1  217
+Free trial + $7.99/month                 3.8±0.1  3.8±0.1  218
+Free trial + $12.99/month                3.9±0.2  4.0±0.2  130
+
+MESSAGE_SUCCESS_
+------------------------------------------------------------
+Level                                    Learning   Enjoyment  N
+------------------------------------------------------------
+You solved it so quickly — you must h... 3.8±0.1  3.9±0.1  495
+Great job — your effort and persisten... 3.9±0.1  3.9±0.1  505
+
+MESSAGE_FAILURE_
+------------------------------------------------------------
+Level                                    Learning   Enjoyment  N
+------------------------------------------------------------
+This design didn't launch successfull... 3.9±0.1  3.9±0.1  493
+That didn't work, but mistakes are ho... 3.8±0.1  3.9±0.1  507
+
+STORYTELLING
+------------------------------------------------------------
+Level                                    Learning   Enjoyment  N
+------------------------------------------------------------
+No story: Just design and test rocket... 3.9±0.1  3.9±0.1  441
+Space rescue story: "Your spaceship m... 3.8±0.1  3.8±0.1  559
+
+ROLE_PLAY
+------------------------------------------------------------
+Level                                    Learning   Enjoyment  N
+------------------------------------------------------------
+No specific role: Just design a rocke... 3.8±0.1  3.8±0.1  439
+Hero astronaut: You are the astronaut... 3.9±0.1  3.9±0.1  561
+
+Rating results saved to: /Users/charlie/github.com/hai/SheRockets/data_analysis/granular_ratings_analysis_20250912_023455.csv
+Analysis complete!
+```
+
 # Conjoint Analysis for AI Tutor Study
 
 This directory contains a comprehensive conjoint analysis of the AI tutor study data, examining parent preferences for different AI tutor features for their K-12 daughters.
