@@ -102,8 +102,8 @@ def get_all_attribute_levels():
         {'attribute': 'Message_success_', 'value': 'You solved it so quickly — you must have a really special talent for science!', 'code': 'brilliance_message'},
         
         # Message failure levels
-        {'attribute': 'Message_failure_', 'value': 'That didn\'t work, but mistakes are how scientists learn. Let\'s try another design.', 'code': 'supportive_message'},
-        {'attribute': 'Message_failure_', 'value': 'This design didn\'t launch successfully. Here is what went wrong.', 'code': 'neutral_message'},
+        {'attribute': 'Message_failure_', 'value': 'That didn\u2019t work, but mistakes are how scientists learn. Let\u2019s try another design.', 'code': 'supportive_message'},
+        {'attribute': 'Message_failure_', 'value': 'This design didn\u2019t launch successfully. Here is what went wrong.', 'code': 'neutral_message'},
         
         # Storytelling levels
         {'attribute': 'Storytelling', 'value': 'Space rescue story: “Your spaceship must deliver medicine to astronauts stranded on the Moon before their oxygen runs out.”', 'code': 'space_rescue_story'},
