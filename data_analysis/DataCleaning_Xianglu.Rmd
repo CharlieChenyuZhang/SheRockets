@@ -1,0 +1,131 @@
+---
+title: "CHI_Data_Cleaning_Xianglu0911"
+output: html_document
+date: "2025-09-11"
+---
+### load
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyr) 
+```
+### read excel
+```{r}
+clean<-read.csv("K12 - Copy_September 10, 2025_21.19.csv")
+```
+
+
+```{r}
+# Observe Data Frame 
+str(clean)
+
+# Number of rows and number of columns
+numberSubjects <- nrow(clean)
+ncol(clean)
+
+# Names of columns
+names(clean)
+
+# look at the first few rows
+head(clean)
+```
+
+```{r}
+clean <- clean[-c(1,2),]
+```
+
+### rename
+```{r}
+names(clean)
+clean$Expected.enjoyment
+
+clean <- clean %>%
+  rename(
+    Prolific_ID = QID14,
+    K12Daughter = Q1,
+    Grade = Q2a,
+    Age_Optional = Q2b,
+    Task1_choice = QID20,
+    Task1_perceivedlearning =Perceived.learning,
+    Task1_expectedenjoyment =Expected.enjoyment,
+    Task2_choice = QID22,
+    Task2_perceivedlearning =QID23,
+    Task2_expectedenjoyment =QID24,
+    Task3_choice = QID26,
+    Task3_perceivedlearning =QID27,
+    Task3_expectedenjoyment =QID28,
+    Task4_choice = QID30,
+    Task4_perceivedlearning =QID31,
+    Task4_expectedenjoyment =QID32,  
+    Task5_choice = QID34,
+    Task5_perceivedlearning =QID35,
+    Task5_expectedenjoyment =QID36, 
+    Task6_choice = QID38,
+    Task6_perceivedlearning =QID39,
+    Task6_expectedenjoyment =QID40, 
+    Task7_choice = QID42,
+    Task7_perceivedlearning =Q43,
+    Task7_expectedenjoyment =Q44,  
+    Task8_choice = QID46,
+    Task8_perceivedlearning =QID47,
+    Task8_expectedenjoyment =QID48     
+    )
+
+names(clean) <- gsub("\\.+", "_", names(clean))
+
+
+```
+
+### screen
+```{r}
+clean$ID_Length <- nchar(clean$Prolific_ID)
+clean <- subset(clean, clean$ID_Length>=24)
+clean$Grade<-as.numeric(clean$Grade)
+clean <- subset(clean, !is.na(Grade))
+
+```
+
+### recode & numeric
+```{r}
+clean <- clean %>%
+  mutate(across(starts_with("Task") & ends_with("_choice"),
+                ~case_when(
+                  . == 3 ~ "A",
+                  . == 4 ~ "B",
+                  TRUE ~ as.character(.)
+                )))
+
+clean <- clean %>%
+  mutate(across(
+    c(
+      paste0("Task", 1:8, "_perceivedlearning"),
+      paste0("Task", 1:8, "_expectedenjoyment")
+    ),
+    as.numeric
+  ))
+```
+
+### remove
+```{r}
+names(clean)
+clean <- clean %>%
+  select(
+    -ResponseId,
+    -RecipientLastName,
+    -RecipientFirstName,
+    -RecipientEmail,
+    -ExternalReference,
+    -LocationLatitude,
+    -LocationLongitude,
+    -ID_Length
+  )
+```
+
+
+###output
+```{r}
+library(writexl)
+write_xlsx(clean,"UploadVersion_CHI.xlsx")
+
+```
+

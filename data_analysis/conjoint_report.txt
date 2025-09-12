@@ -1,0 +1,84 @@
+
+CONJOINT ANALYSIS REPORT - AI TUTOR STUDY
+==========================================
+
+EXECUTIVE SUMMARY
+-----------------
+This report presents the results of a conjoint analysis study examining parent preferences 
+for AI tutor features for their K-12 daughters. The study included 125 respondents 
+who completed 8 choice tasks each, resulting in 2000 total observations.
+
+KEY FINDINGS
+------------
+1. Most Important Attributes (by importance score):
+   1. Pricing: 52.9%
+   2. Tutor: 23.5%
+   3. Storytelling: 19.1%
+   4. Color: 3.0%
+   5. Message Success: 1.5%
+   6. Message Failure: 0.0%
+   7. Role Play: 0.0%
+
+2. Part-worth Utilities:
+
+   Tutor:
+     - Female: 0.000
+     - Male: -0.669
+
+   Color:
+     - Warm: 0.000
+     - Tech: -0.084
+
+   Pricing:
+     - Free: 0.000
+     - $4.99: -0.625
+     - $7.99: -0.890
+     - $9.99: -1.154
+     - $12.99: -1.502
+
+   Message Success:
+     - Growth: 0.000
+     - Brilliance: -0.043
+
+   Message Failure:
+     - Supportive: 0.000
+     - Neutral: 0.000
+
+   Storytelling:
+     - Story: 0.000
+     - No_Story: -0.542
+
+   Role Play:
+     - Role_Play: 0.000
+     - No_Role: 0.000
+
+3. Market Simulation Results:
+   - Premium Female: 60.9% market share
+   - Balanced: 32.6% market share
+   - Tech Male: 6.6% market share
+
+4. Statistical Significance Tests:
+   - Perceived Learning (Female vs Male): t=0.524, p=0.601
+   - Expected Enjoyment (Female vs Male): t=1.796, p=0.073
+   - Choice Preference (Chi-square): χ²=44.402, p=0.000
+
+BUSINESS RECOMMENDATIONS
+------------------------
+Based on the analysis, the following recommendations are made:
+
+1. Focus on the most important attributes: Pricing and Tutor
+
+2. Optimal product configuration appears to be: Premium Female
+
+3. Consider the trade-offs between different attribute levels based on the part-worth utilities
+
+4. Further research may be needed to understand the underlying drivers of these preferences
+
+TECHNICAL DETAILS
+-----------------
+- Sample size: 125 respondents
+- Total observations: 2000
+- Model type: Logistic Regression
+- Attributes analyzed: 7
+- Tasks per respondent: 8
+

@@ -1,0 +1,18 @@
+attribute,level,level_code,coefficient,p_value,pp_effect,significance,abs_effect
+Pricing,School pays (free for families),school_pays,0.7583417480661454,1e-06,18.958543701653635,***,18.958543701653635
+Pricing,Free trial + $12.99/month,pricing_12.99,-0.5869255335065829,1e-06,-14.673138337664573,***,14.673138337664573
+Storytelling,No story: Just design and test rockets in a sandbox-style game.,no_story,-0.28390005610983493,1e-06,-7.097501402745873,***,7.097501402745873
+Pricing,Free trial + $9.99/month,pricing_9.99,-0.2599200202404966,1e-06,-6.498000506012415,***,6.498000506012415
+Tutor,Male AI tutor,male_tutor,-0.17798569068822853,1e-06,-4.449642267205713,***,4.449642267205713
+Tutor,Female AI tutor,female_tutor,0.17798569068822853,1e-06,4.449642267205713,***,4.449642267205713
+Pricing,Free trial + $4.99/month,pricing_4.99,0.15648717403334378,1e-06,3.9121793508335942,***,3.9121793508335942
+Role_play,No specific role: Just design a rocket and see how it works.,no_specific_role,-0.15305859467287977,1e-06,-3.8264648668219943,***,3.8264648668219943
+Role_play,Hero astronaut: You are the astronaut in charge — the team is counting on you to complete this mission.,hero_astronaut,0.15305859467287944,1e-06,3.826464866821986,***,3.826464866821986
+Pricing,Free trial + $7.99/month,pricing_7.99,-0.06798336835240949,0.104,-1.6995842088102373,n.s.,1.6995842088102373
+Color_palette,Tech & bold (deep blue / black / neon),tech_colors,-0.03851862008687865,0.042,-0.9629655021719662,*,0.9629655021719662
+Color_palette,Friendly & warm (coral / lavender / peach),friendly_colors,0.03851862008687865,0.042,0.9629655021719662,*,0.9629655021719662
+Message_success_,Great job — your effort and persistence helped you solve this!,growth_message,0.00472293553494939,0.808,0.11807338837373474,n.s.,0.11807338837373474
+Message_success_,You solved it so quickly — you must have a really special talent for science!,brilliance_message,-0.00472293553494939,0.808,-0.11807338837373474,n.s.,0.11807338837373474
+Message_failure_,"That didn't work, but mistakes are how scientists learn. Let's try another design.",supportive_message,0.0,2.0,0.0,n.s.,0.0
+Message_failure_,This design didn't launch successfully. Here is what went wrong.,neutral_message,0.0,2.0,0.0,n.s.,0.0
+Storytelling,"Space rescue story: ""Your spaceship must deliver medicine to astronauts stranded on the Moon before their oxygen runs out.""",space_rescue_story,0.0,2.0,0.0,n.s.,0.0
