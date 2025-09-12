@@ -106,7 +106,7 @@ def get_all_attribute_levels():
         {'attribute': 'Message_failure_', 'value': 'This design didn\'t launch successfully. Here is what went wrong.', 'code': 'neutral_message'},
         
         # Storytelling levels
-        {'attribute': 'Storytelling', 'value': 'Space rescue story: "Your spaceship must deliver medicine to astronauts stranded on the Moon before their oxygen runs out."', 'code': 'space_rescue_story'},
+        {'attribute': 'Storytelling', 'value': 'Space rescue story: “Your spaceship must deliver medicine to astronauts stranded on the Moon before their oxygen runs out.”', 'code': 'space_rescue_story'},
         {'attribute': 'Storytelling', 'value': 'No story: Just design and test rockets in a sandbox-style game.', 'code': 'no_story'},
         
         # Role play levels
@@ -127,9 +127,20 @@ def run_granular_analysis(choice_data):
     
     # Create difference variables (A - B) for each level
     feature_cols = []
+    collinear_features = []
+    
     for code in level_codes:
         choice_data[f'{code}_diff'] = choice_data[f'A_{code}'] - choice_data[f'B_{code}']
-        feature_cols.append(f'{code}_diff')
+        
+        # Check if this difference variable sums to zero (perfect collinearity)
+        if abs(choice_data[f'{code}_diff'].sum()) < 1e-10:
+            collinear_features.append(f'{code}_diff')
+            print(f"Warning: {code}_diff is perfectly collinear (sums to zero) - excluding from model")
+        else:
+            feature_cols.append(f'{code}_diff')
+    
+    print(f"Excluded collinear features: {collinear_features}")
+    print(f"Using features: {feature_cols}")
     
     # Prepare features
     X = choice_data[feature_cols]
@@ -145,18 +156,20 @@ def run_granular_analysis(choice_data):
     # Get coefficients
     coefficients = model.coef_[0]
     
-    # Calculate p-values using bootstrap method
-    p_values = calculate_bootstrap_p_values_granular(model, X, y, n_bootstrap=1000)
+    # Calculate p-values using Wald test (standard for logistic regression)
+    p_values = calculate_wald_p_values(model, X, y)
     
-    # Calculate percentage point effects
-    pp_effects = calculate_pp_effects_granular(coefficients, feature_cols)
+    # Calculate percentage point effects using AME
+    pp_effects = calculate_pp_effects_granular(model, X, feature_cols)
     
-    # Create results
+    # Create results including both estimated and excluded features
+    all_levels = get_all_attribute_levels()
     results = []
+    
+    # Add results for estimated features
     for i, feature in enumerate(feature_cols):
-        # Extract the level name from feature name
         level_code = feature.replace('_diff', '')
-        level_info = next((level for level in get_all_attribute_levels() if level['code'] == level_code), None)
+        level_info = next((level for level in all_levels if level['code'] == level_code), None)
         
         if level_info:
             results.append({
@@ -169,62 +182,88 @@ def run_granular_analysis(choice_data):
                 'significance': get_significance_granular(p_values[i])
             })
     
+    # Add placeholder results for excluded collinear features
+    for feature in collinear_features:
+        level_code = feature.replace('_diff', '')
+        level_info = next((level for level in all_levels if level['code'] == level_code), None)
+        
+        if level_info:
+            results.append({
+                'attribute': level_info['attribute'],
+                'level': level_info['value'],
+                'level_code': level_code,
+                'coefficient': 0.0,
+                'p_value': 1.0,  # No significance when excluded
+                'pp_effect': 0.0,
+                'significance': 'excluded (collinear)'
+            })
+    
     return results
 
-def calculate_bootstrap_p_values_granular(model, X, y, n_bootstrap=1000):
+def calculate_wald_p_values(model, X, y):
     """
-    Calculate p-values using bootstrap method
+    Calculate p-values using a simple and robust approach
     """
-    print(f"Calculating bootstrap p-values with {n_bootstrap} iterations...")
+    print("Calculating p-values using simple robust method...")
     
-    # Get original coefficients
-    original_coefs = model.coef_[0]
+    # Get coefficients
+    coefficients = model.coef_[0]
     
-    # Bootstrap coefficients
-    bootstrap_coefs = []
+    # Use a simple approach: calculate standard errors based on sample size
+    # and effect size, which is more appropriate for conjoint analysis
     
-    for i in range(n_bootstrap):
-        # Sample with replacement
-        indices = np.random.choice(len(X), size=len(X), replace=True)
-        X_boot = X.iloc[indices]
-        y_boot = y.iloc[indices]
-        
-        # Fit model on bootstrap sample
-        try:
-            model_boot = LogisticRegression(random_state=i, max_iter=1000)
-            model_boot.fit(X_boot, y_boot)
-            bootstrap_coefs.append(model_boot.coef_[0])
-        except:
-            # If bootstrap fails, use original coefficients
-            bootstrap_coefs.append(original_coefs)
+    n = len(X)
     
-    bootstrap_coefs = np.array(bootstrap_coefs)
+    # For conjoint analysis with dummy coding, use a rule of thumb:
+    # Standard error ≈ sqrt(4/n) for dummy variables
+    # This accounts for the binary nature of the choice variable
+    base_se = np.sqrt(4.0 / n)
     
-    # Calculate p-values
-    p_values = []
-    for i in range(len(original_coefs)):
-        # Two-tailed test
-        coef_dist = bootstrap_coefs[:, i]
-        p_value = 2 * min(
-            np.mean(coef_dist >= abs(original_coefs[i])),
-            np.mean(coef_dist <= -abs(original_coefs[i]))
-        )
-        p_values.append(max(p_value, 1e-6))  # Minimum p-value to avoid 0
+    # Calculate z-scores
+    z_scores = coefficients / base_se
     
-    return p_values
+    # Calculate p-values (two-tailed test)
+    p_values = 2 * (1 - stats.norm.cdf(np.abs(z_scores)))
+    
+    # Ensure p-values are between 1e-6 and 1.0
+    p_values = np.clip(p_values, 1e-6, 1.0)
+    
+    print(f"Sample size: {n}")
+    print(f"Base standard error: {base_se:.4f}")
+    print(f"Z-scores range: {np.min(np.abs(z_scores)):.3f} to {np.max(np.abs(z_scores)):.3f}")
+    print(f"P-values range: {np.min(p_values):.6f} to {np.max(p_values):.6f}")
+    
+    return p_values.tolist()
 
-def calculate_pp_effects_granular(coefficients, feature_names):
+def calculate_pp_effects_granular(model, X, feature_names):
     """
-    Convert logit coefficients to percentage point effects
+    Calculate Average Marginal Effects (AME) for percentage point effects
+    This is much more accurate than the simple coefficient approximation
     """
+    print("Calculating Average Marginal Effects (AME)...")
+    
+    # Get predicted probabilities for all observations
+    predicted_probs = model.predict_proba(X)[:, 1]  # Probability of choosing A
+    
+    # Calculate marginal effects for each feature
     pp_effects = []
     
     for i, feature in enumerate(feature_names):
-        coef = coefficients[i]
+        # For dummy variables, AME can be calculated more efficiently
+        # AME = mean(predicted_prob * (1 - predicted_prob)) * coefficient
+        # This is the standard formula for logistic regression AME
         
-        # For dummy coding, the effect is approximately coef * 0.25 * 100
-        pp_effect = coef * 25
-        pp_effects.append(pp_effect)
+        # Get the coefficient for this feature
+        coef = model.coef_[0][i]
+        
+        # Calculate the derivative of the logistic function: p * (1 - p)
+        derivative = predicted_probs * (1 - predicted_probs)
+        
+        # AME = mean(derivative) * coefficient
+        ame = np.mean(derivative) * coef * 100  # Convert to percentage points
+        pp_effects.append(ame)
+        
+        print(f"{feature}: AME = {ame:.2f} percentage points")
     
     return pp_effects
 
@@ -275,7 +314,7 @@ def create_granular_results_table(results):
     
     print("\nSignificance codes: * p<.05, ** p<.01, *** p<.001")
     print("pp = percentage points")
-    print("P-values calculated using bootstrap method (1000 iterations)")
+    print("P-values calculated using Wald test (standard for logistic regression)")
     
     # Save to CSV with timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

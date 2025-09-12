@@ -1,0 +1,18 @@
+attribute,level,level_code,coefficient,p_value,pp_effect,significance,abs_effect
+Pricing,School pays (free for families),school_pays,0.7583863180285205,1e-06,16.15158056623663,***,16.15158056623663
+Pricing,Free trial + $12.99/month,pricing_12.99,-0.5869265770318907,1e-06,-12.499951106765044,***,12.499951106765044
+Pricing,Free trial + $9.99/month,pricing_9.99,-0.25994432935881984,3.955208181194436e-05,-5.536112240644926,***,5.536112240644926
+Tutor,Male AI tutor,male_tutor,-0.1780241499650071,0.004880623756245317,-3.7914336434369456,**,3.7914336434369456
+Tutor,Female AI tutor,female_tutor,0.1780241499650071,0.004880623756245317,3.7914336434369456,**,3.7914336434369456
+Pricing,Free trial + $4.99/month,pricing_4.99,0.15654946452696952,0.013313758178087332,3.3340808355847233,*,3.3340808355847233
+Role_play,Hero astronaut: You are the astronaut in charge — the team is counting on you to complete this mission.,hero_astronaut,0.1530691164697215,0.015510469691216278,3.2599588205788135,*,3.2599588205788135
+Role_play,No specific role: Just design a rocket and see how it works.,no_specific_role,-0.1530691164697215,0.015510469691216278,-3.2599588205788135,*,3.2599588205788135
+Storytelling,Space rescue story: “Your spaceship must deliver medicine to astronauts stranded on the Moon before their oxygen runs out.”,space_rescue_story,0.14228633864791992,0.024465165742061368,3.0303147716600565,*,3.0303147716600565
+Storytelling,No story: Just design and test rockets in a sandbox-style game.,no_story,-0.14228633864791967,0.02446516574206159,-3.0303147716600516,*,3.0303147716600516
+Pricing,Free trial + $7.99/month,pricing_7.99,-0.06806487616477967,0.28183773628822784,-1.4495980544113862,n.s.,1.4495980544113862
+Color_palette,Tech & bold (deep blue / black / neon),tech_colors,-0.038515033614617736,0.5425402463255566,-0.8202662068785054,n.s.,0.8202662068785054
+Color_palette,Friendly & warm (coral / lavender / peach),friendly_colors,0.038515033614617736,0.5425402463255566,0.8202662068785054,n.s.,0.8202662068785054
+Message_success_,Great job — your effort and persistence helped you solve this!,growth_message,0.004735485712002892,0.9403144833847736,0.10085305757691787,n.s.,0.10085305757691787
+Message_success_,You solved it so quickly — you must have a really special talent for science!,brilliance_message,-0.004735485712002892,0.9403144833847736,-0.10085305757691787,n.s.,0.10085305757691787
+Message_failure_,"That didn't work, but mistakes are how scientists learn. Let's try another design.",supportive_message,0.0,1.0,0.0,excluded (collinear),0.0
+Message_failure_,This design didn't launch successfully. Here is what went wrong.,neutral_message,0.0,1.0,0.0,excluded (collinear),0.0

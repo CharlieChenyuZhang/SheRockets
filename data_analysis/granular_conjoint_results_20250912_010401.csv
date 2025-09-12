@@ -1,0 +1,18 @@
+attribute,level,level_code,coefficient,p_value,pp_effect,significance,abs_effect
+Pricing,School pays (free for families),school_pays,0.7583417480661454,1e-06,16.151930580144462,***,16.151930580144462
+Pricing,Free trial + $12.99/month,pricing_12.99,-0.5869255335065829,1e-06,-12.500934436337666,***,12.500934436337666
+Storytelling,No story: Just design and test rockets in a sandbox-style game.,no_story,-0.28390005610983493,7.160734276645542e-06,-6.0467909220068465,***,6.0467909220068465
+Pricing,Free trial + $9.99/month,pricing_9.99,-0.2599200202404966,3.961796966289732e-05,-5.536039831672382,***,5.536039831672382
+Tutor,Male AI tutor,male_tutor,-0.17798569068822853,0.004889866328142922,-3.790919499798631,**,3.790919499798631
+Tutor,Female AI tutor,female_tutor,0.17798569068822853,0.004889866328142922,3.790919499798631,**,3.790919499798631
+Pricing,Free trial + $4.99/month,pricing_4.99,0.15648717403334378,0.01335052147950444,3.3330223189150985,*,3.3330223189150985
+Role_play,No specific role: Just design a rocket and see how it works.,no_specific_role,-0.15305859467287977,0.015517567741381688,-3.2599969633152632,*,3.2599969633152632
+Role_play,Hero astronaut: You are the astronaut in charge — the team is counting on you to complete this mission.,hero_astronaut,0.15305859467287944,0.01551756774138191,3.2599969633152566,*,3.2599969633152566
+Pricing,Free trial + $7.99/month,pricing_7.99,-0.06798336835240949,0.28241438187242673,-1.4479786310495077,n.s.,1.4479786310495077
+Color_palette,Tech & bold (deep blue / black / neon),tech_colors,-0.03851862008687865,0.5425026590745239,-0.8204085813194022,n.s.,0.8204085813194022
+Color_palette,Friendly & warm (coral / lavender / peach),friendly_colors,0.03851862008687865,0.5425026590745239,0.8204085813194022,n.s.,0.8204085813194022
+Message_success_,Great job — your effort and persistence helped you solve this!,growth_message,0.00472293553494939,0.9404723701655568,0.10059386429605634,n.s.,0.10059386429605634
+Message_success_,You solved it so quickly — you must have a really special talent for science!,brilliance_message,-0.00472293553494939,0.9404723701655568,-0.10059386429605634,n.s.,0.10059386429605634
+Message_failure_,"That didn't work, but mistakes are how scientists learn. Let's try another design.",supportive_message,0.0,1.0,0.0,n.s.,0.0
+Message_failure_,This design didn't launch successfully. Here is what went wrong.,neutral_message,0.0,1.0,0.0,n.s.,0.0
+Storytelling,"Space rescue story: ""Your spaceship must deliver medicine to astronauts stranded on the Moon before their oxygen runs out.""",space_rescue_story,0.0,1.0,0.0,n.s.,0.0
