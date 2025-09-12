@@ -1,0 +1,12 @@
+attribute,level,level_code,coefficient,p_value,pp_effect,significance
+Pricing,School pays (free for families),school_pays,1.360556130622519,4.256465887157791e-19,54.680804376007174,***
+Pricing,Free trial + $4.99/month,pricing_4.99,0.7586802780888257,6.648809847218375e-08,30.729299345042303,***
+Pricing,Free trial + $7.99/month,pricing_7.99,0.5260287503921686,0.00011602629363302667,21.46247534494306,***
+Tutor,Male AI tutor,male_tutor,-0.35769029894310905,2.733667999049525e-07,-15.366354957910163,***
+Pricing,Free trial + $9.99/month,pricing_9.99,0.32801014182761734,0.02145150546465638,13.488003794989531,*
+Role_play,No specific role: Just design a rocket and see how it works.,no_specific_role,-0.30931708604503033,8.328194667479413e-06,-13.235669769426966,***
+Storytelling,"Space rescue story: ""Your spaceship must deliver medicine to astronauts stranded on the Moon before their oxygen runs out.""",space_rescue_story,0.2902660835096712,3.0919741264883046e-05,12.411558056566895,***
+ASC/position,(A position bias),ASC_A,0.09155220397466125,0.18363718827722464,3.892107820815778,n.s.
+Color_palette,Tech & bold (deep blue / black / neon),tech_colors,-0.0781212278983187,0.258162901713905,-3.312459681591355,n.s.
+Message_failure_,This design didn't launch successfully. Here is what went wrong.,neutral_message,-0.06533591189020427,0.344662939593545,-2.7729172273705287,n.s.
+Message_success_,You solved it so quickly — you must have a really special talent for science!,brilliance_message,-0.011556179274461629,0.8668730727647833,-0.4906011418101913,n.s.
